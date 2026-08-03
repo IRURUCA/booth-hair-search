@@ -28,3 +28,6 @@ eval/
 # data/hair_vectors.json   … 検索用の髪形状タグベクトル
 # data/hair_vocab.json     … タグ語彙
 # data/product_stats.json  … スキ数・公開日（並び替え用）
+model/
+dist/
+build/

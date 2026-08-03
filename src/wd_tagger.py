@@ -26,9 +26,16 @@ CAT_GENERAL = 0
 
 
 class WDTagger:
-    def __init__(self, cache_dir: Path | None = None, repo: str = MODEL_REPO) -> None:
-        model_path = hf_hub_download(repo, MODEL_FILE, cache_dir=cache_dir)
-        label_path = hf_hub_download(repo, LABEL_FILE, cache_dir=cache_dir)
+    def __init__(self, cache_dir: Path | None = None, repo: str = MODEL_REPO,
+                 model_dir: Path | None = None) -> None:
+        # model_dir が指定されれば同梱モデルを直接ロード（配布ビルド用、ネット不要）。
+        # 無ければ HuggingFace から取得（開発・初回）。
+        if model_dir is not None:
+            model_path = str(Path(model_dir) / MODEL_FILE)
+            label_path = str(Path(model_dir) / LABEL_FILE)
+        else:
+            model_path = hf_hub_download(repo, MODEL_FILE, cache_dir=cache_dir)
+            label_path = hf_hub_download(repo, LABEL_FILE, cache_dir=cache_dir)
 
         self.session = ort.InferenceSession(
             model_path, providers=["CPUExecutionProvider"]

@@ -18,9 +18,7 @@ from pathlib import Path
 import requests
 
 from booth_client import USER_AGENT
-
-ROOT = Path(__file__).resolve().parent.parent
-DATA_DIR = ROOT / "data"
+from paths import USER_DATA as DATA_DIR  # 書き込み可能な場所（凍結時は exe 隣）
 
 REPO = "IRURUCA/booth-hair-search"
 BRANCH = "main"

@@ -19,13 +19,13 @@ import gradio as gr
 import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from matcher import HairMatcher, ROOT  # noqa: E402
+from matcher import HairMatcher  # noqa: E402
 from booth_client import USER_AGENT  # noqa: E402
+from paths import IMAGES_DIR  # noqa: E402
 
 # サムネのローカルキャッシュ。配布物には画像を同梱せず、表示時に BOOTH から取得して
 # ここへ貯める（＝画像を再配布しない。各利用者の端末が閲覧分だけ取得）。
-THUMB_CACHE = ROOT / "images"
-IMAGES_DIR = THUMB_CACHE  # 後方互換
+THUMB_CACHE = IMAGES_DIR
 
 _thumb_session = requests.Session()
 _thumb_session.headers["User-Agent"] = USER_AGENT
@@ -224,7 +224,7 @@ def on_sort(results, sort):
 
 with gr.Blocks(title="BOOTH 髪型検索") as demo:
     gr.Markdown(
-        "# BOOTH 髪型検索（実現可能性プロトタイプ）\n"
+        "# BOOTH 髪型検索\n"
         "アバターのスクショや髪型画像から、BOOTHの似た髪型商品を探します。\n"
         "**タグは手で直せます**——自動抽出が取りこぼした特徴（三つ編み等）を足すと精度が上がります。"
     )
@@ -275,4 +275,7 @@ with gr.Blocks(title="BOOTH 髪型検索") as demo:
 
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860, allowed_paths=[str(IMAGES_DIR)])
+    # server_port=None → 空きポートを自動探索（7860が使用中でも落ちない）。
+    # inbrowser=True → 選ばれたポートを既定ブラウザで自動オープン。
+    demo.launch(server_name="127.0.0.1", server_port=None,
+                allowed_paths=[str(IMAGES_DIR)], inbrowser=True)

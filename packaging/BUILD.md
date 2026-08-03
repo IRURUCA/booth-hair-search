@@ -3,9 +3,10 @@
 目標: **ダウンロードしてダブルクリックするだけ**で起動するローカルアプリ。
 セットアップ不要、サムネは表示時に BOOTH から取得（画像は同梱しない）。
 
-> ⚠️ この手順は出発点です。PyInstaller × Gradio × onnxruntime の同梱は
-> 環境依存のクセがあり、**実機での試行錯誤（数回のビルド）が必要**です。
-> まず動くところまで持っていってから配布してください。
+> ✅ 下記手順で Windows 実機ビルド・起動・検索・サムネ都度取得まで動作確認済み
+>   （dist フォルダ約 686MB、exe 20MB、同梱モデルでオフライン推論、
+>    サムネは exe 隣の `booth-hair-search-data/images/` にキャッシュ）。
+>   環境が変われば微調整が要る場合があります。
 
 ## 方針
 
@@ -13,31 +14,32 @@
 - **同梱しないもの**: `images/`（＝BOOTHサムネ。表示時に取得＆キャッシュ）、`cache/`、`.venv/`
 - 初回起動でモデルDLが走らないよう、**モデルもパッケージに含める**（オフラインでもタグ抽出可）
 
-## 1. モデルを同梱用に用意
+## 1. モデルを同梱用に用意（`model/` へ2ファイルをコピー）
 
-現在モデルは `cache/hf` に hf_hub_download でDL済み。これをパッケージに同梱し、
-実行時は `HF_HUB_OFFLINE=1` ＋ `cache_dir=<同梱パス>` でオフライン読み込みさせる。
-（`src/wd_tagger.py` は既に `cache_dir` を受け取れる。配布ビルドでは同梱パスを渡す）
+`src/wd_tagger.py` は `model_dir=` を受け取ると `model.onnx` + `selected_tags.csv` を
+直接ロードする（HF不要・オフライン）。`src/paths.py` は凍結時 `model/` を同梱先として見る。
 
-## 2. PyInstaller でビルド（Windows 例）
+```bash
+# cache/hf にDL済みの swinv2 モデルから、flat な model/ へコピー
+SNAP="cache/hf/models--SmilingWolf--wd-swinv2-tagger-v3/snapshots/<hash>"
+mkdir -p model
+cp "$SNAP/model.onnx" model/model.onnx
+cp "$SNAP/selected_tags.csv" model/selected_tags.csv
+```
+（`<hash>` は `snapshots/` 直下のフォルダ名。eva02(1.2GB)は同梱しないこと）
 
-```bat
+## 2. PyInstaller でビルド（spec 使用・確認済み）
+
+```bash
 pip install pyinstaller
-pyinstaller --noconfirm --name booth-hair-search ^
-  --collect-all gradio ^
-  --collect-all gradio_client ^
-  --collect-all onnxruntime ^
-  --collect-data safehttpx ^
-  --collect-data groovy ^
-  --add-data "data;data" ^
-  --add-data "cache/hf;cache/hf" ^
-  src/step7_ui.py
+# リポジトリ直下から実行
+pyinstaller packaging/booth-hair-search.spec --noconfirm --distpath dist --workpath build
 ```
 
-- `--collect-all gradio` … Gradio はテンプレ/静的ファイルが多く、これが無いと起動時に落ちる（最重要）
-- `--add-data "data;data"` … ベクトル等のJSONを同梱（Windowsは区切りが `;`、mac/Linuxは `:`）
-- `--add-data "cache/hf;cache/hf"` … モデルを同梱
-- 出力は `dist/booth-hair-search/`（フォルダ配布）。単一exeにしたいなら `--onefile`（起動が遅くなる・一時展開する点に注意）
+- spec が `collect_all("gradio"/"onnxruntime"…)` と `data/*.json`・`model/` の同梱を行う
+- spec 内の相対パスは spec 位置基準になるため、`SPECPATH` からリポジトリ直下を解決している
+- 出力は `dist/booth-hair-search/`（フォルダ配布、約686MB）。`booth-hair-search.exe` を起動
+- 配布は `dist/booth-hair-search/` を zip して配る（例: GitHub Release にアップロード）
 
 ## 3. 既知のハマりどころ
 
