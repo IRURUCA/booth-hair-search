@@ -222,9 +222,9 @@ def on_sort(results, sort):
     return gr.update(value=1), gallery, table_html
 
 
-with gr.Blocks(title="BOOTH 髪型検索") as demo:
+with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     gr.Markdown(
-        "# BOOTH 髪型検索\n"
+        "# 画像から探す髪型検索ツール\n"
         "アバターのスクショや髪型画像から、BOOTHの似た髪型商品を探します。\n"
         "**タグは手で直せます**——自動抽出が取りこぼした特徴（三つ編み等）を足すと精度が上がります。"
     )
