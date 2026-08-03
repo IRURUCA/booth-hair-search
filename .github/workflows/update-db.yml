@@ -1,0 +1,56 @@
+name: Update hair DB
+
+# 週1で新着の新商品だけを差分取り込み、ベクトル等を更新してコミットする。
+# 手動実行(workflow_dispatch)も可。画像はコミットしない(.gitignore)。
+on:
+  schedule:
+    - cron: "17 3 * * 1"   # 毎週月曜 03:17 UTC（負荷が偏らない半端な時刻に）
+  workflow_dispatch: {}
+
+# 同時実行を1つに制限（重複クロール防止）
+concurrency:
+  group: update-db
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # data/*.json をコミット&プッシュするため
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # WD Tagger モデル(~400MB)をキャッシュ。初回のみDL。
+      - name: Cache tagger model
+        uses: actions/cache@v4
+        with:
+          path: cache/hf
+          key: wd-swinv2-tagger-v3
+
+      - name: Install deps (差分更新に必要な最小限)
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4 lxml numpy onnxruntime Pillow pandas huggingface_hub
+
+      - name: Run differential update
+        env:
+          HF_HUB_DISABLE_SYMLINKS_WARNING: "1"
+        run: python src/step13_update.py
+
+      - name: Commit updated DB if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/products.json data/hair_vectors.json data/product_stats.json
+          if git diff --cached --quiet; then
+            echo "変更なし。コミットしません。"
+          else
+            git commit -m "chore: 差分更新（新着髪型を取り込み） [skip ci]"
+            git push
+          fi
