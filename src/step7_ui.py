@@ -52,6 +52,15 @@ def _thumb_path(pid: str, url: str | None):
         pass
     return None
 
+print("最新DBを確認中...", file=sys.stderr)
+try:
+    from db_update import sync_db
+    _n = sync_db()
+    if _n:
+        print(f"  最新DBを取得: {_n} ファイル更新", file=sys.stderr)
+except Exception:  # noqa: BLE001
+    pass  # ネット不可等は同梱DBで続行
+
 print("モデルとDBをロード中...", file=sys.stderr)
 MATCHER = HairMatcher()
 print(f"  準備完了: {len(MATCHER.pids)} 商品 / 語彙 {len(MATCHER.vocab)} タグ", file=sys.stderr)
