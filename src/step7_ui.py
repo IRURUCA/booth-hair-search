@@ -208,6 +208,14 @@ def on_tags_change(selected_tags):
     return gr.update(value=final), msg
 
 
+def _filtered(results, tag_only, selected_tags):
+    """タグ絞り込みを表示時に適用（Stateには常に全ランキングを保持）。"""
+    if not tag_only or not selected_tags:
+        return results or []
+    return [r for r in (results or [])
+            if MATCHER.contains_any(r["product_id"], selected_tags)]
+
+
 def on_search(selected_tags, detected, tag_only, sort):
     """検索してランキング全体を State に入れ、1ページ目を描画。ページ選択肢も更新。"""
     if not selected_tags:
@@ -223,30 +231,35 @@ def on_search(selected_tags, detected, tag_only, sort):
     for t in selected_tags:
         if t not in detected:
             query[t] = 1.0  # ユーザーが手で足した
-    # DBにある限り全件をランキング（ページで手繰れるように）
+    # DBにある限り全件をランキング（ページで手繰れるように）。絞り込みは表示時に適用
     pool = MATCHER.search(query, top_k=len(MATCHER.pids))
-    if tag_only:
-        # 選択タグをどれか1つでも持つ商品だけをランクに残す
-        pool = [r for r in pool if MATCHER.contains_any(r["product_id"], selected_tags)]
-
-    npages = _num_pages(len(pool))
-    gallery, table_html = _render_page(pool, 1, sort)
+    view = _filtered(pool, tag_only, selected_tags)
+    npages = _num_pages(len(view))
+    gallery, table_html = _render_page(view, 1, sort)
     return pool, gr.update(choices=list(range(1, npages + 1)), value=1), gallery, table_html
 
 
-def goto(results, page, sort):
+def goto(results, page, sort, tag_only, selected_tags):
     """State のランキングから指定ページを描画（◀▶・ページ選択の共通処理）。"""
-    results = results or []
-    npages = _num_pages(len(results))
+    view = _filtered(results, tag_only, selected_tags)
+    npages = _num_pages(len(view))
     page = max(1, min(int(page), npages))
-    gallery, table_html = _render_page(results, page, sort)
+    gallery, table_html = _render_page(view, page, sort)
     return gr.update(value=page), gallery, table_html
 
 
-def on_sort(results, sort):
+def on_sort(results, sort, tag_only, selected_tags):
     """並び順を変えたら1ページ目に戻して再描画。"""
-    gallery, table_html = _render_page(results or [], 1, sort)
+    gallery, table_html = _render_page(_filtered(results, tag_only, selected_tags), 1, sort)
     return gr.update(value=1), gallery, table_html
+
+
+def on_toggle_filter(results, tag_only, selected_tags, sort):
+    """絞り込みチェックの切り替えを即反映（再検索なし）。ページ数も更新して1ページ目へ。"""
+    view = _filtered(results, tag_only, selected_tags)
+    npages = _num_pages(len(view))
+    gallery, table_html = _render_page(view, 1, sort)
+    return gr.update(choices=list(range(1, npages + 1)), value=1), gallery, table_html
 
 
 with gr.Blocks(title="BOOTH 髪型検索") as demo:
@@ -271,21 +284,27 @@ with gr.Blocks(title="BOOTH 髪型検索") as demo:
                 info="「ツインテール」「ボブ」「みつあみ」等の日本語で入れても自動変換します。",
             )
             tag_note = gr.Markdown()
-            tag_only = gr.Checkbox(
-                label="選択タグを含む商品だけをランクに入れる", value=False,
-                info="ONにすると、選んだタグを1つも持たない商品を除外します。",
-            )
             search_btn = gr.Button("② 検索", variant="primary")
         with gr.Column(scale=2):
-            sort = gr.Radio(
-                choices=["類似度順", "類似＋スキ", "類似＋新着"], value="類似度順", label="並び順",
-                info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
-            )
+            with gr.Row():
+                sort = gr.Radio(
+                    choices=["類似度順", "類似＋スキ", "類似＋新着"], value="類似度順", label="並び順",
+                    info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
+                    scale=2,
+                )
+                tag_only = gr.Checkbox(
+                    label="選択タグを含む商品だけ", value=False,
+                    info="ONで選んだタグを1つも持たない商品を除外（即反映）。",
+                    scale=1,
+                )
             with gr.Row():
                 prev_btn = gr.Button("◀ 前の10件", scale=1)
                 page_dd = gr.Dropdown(choices=[1], value=1, label="ページ (10件ずつ)", scale=2)
                 next_btn = gr.Button("次の10件 ▶", scale=1)
-            gallery = gr.Gallery(label="候補", columns=5, height=360, object_fit="cover")
+            # height固定だとギャラリー内スクロールが発生して1段目が切れる → 自動高さで
+            # 2行(10件)を丸ごと表示する
+            gallery = gr.Gallery(label="候補", columns=5, rows=2, height="auto",
+                                 object_fit="cover")
             result_html = gr.HTML()
 
     extract_btn.click(on_extract, [image], [tags, detected_state, info])
@@ -293,11 +312,17 @@ with gr.Blocks(title="BOOTH 髪型検索") as demo:
     tags.change(on_tags_change, [tags], [tags, tag_note])
     search_btn.click(on_search, [tags, detected_state, tag_only, sort],
                      [results_state, page_dd, gallery, result_html])
-    sort.change(on_sort, [results_state, sort], [page_dd, gallery, result_html])
-    page_dd.change(goto, [results_state, page_dd, sort], [page_dd, gallery, result_html])
-    prev_btn.click(lambda res, p, s: goto(res, int(p) - 1, s), [results_state, page_dd, sort],
+    sort.change(on_sort, [results_state, sort, tag_only, tags],
+                [page_dd, gallery, result_html])
+    tag_only.change(on_toggle_filter, [results_state, tag_only, tags, sort],
+                    [page_dd, gallery, result_html])
+    page_dd.change(goto, [results_state, page_dd, sort, tag_only, tags],
                    [page_dd, gallery, result_html])
-    next_btn.click(lambda res, p, s: goto(res, int(p) + 1, s), [results_state, page_dd, sort],
+    prev_btn.click(lambda res, p, s, f, t: goto(res, int(p) - 1, s, f, t),
+                   [results_state, page_dd, sort, tag_only, tags],
+                   [page_dd, gallery, result_html])
+    next_btn.click(lambda res, p, s, f, t: goto(res, int(p) + 1, s, f, t),
+                   [results_state, page_dd, sort, tag_only, tags],
                    [page_dd, gallery, result_html])
 
 
