@@ -19,13 +19,13 @@ import gradio as gr
 import requests
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from matcher import HairMatcher, ROOT  # noqa: E402
+from matcher import HairMatcher  # noqa: E402
 from booth_client import USER_AGENT  # noqa: E402
+from paths import IMAGES_DIR  # noqa: E402
 
 # サムネのローカルキャッシュ。配布物には画像を同梱せず、表示時に BOOTH から取得して
 # ここへ貯める（＝画像を再配布しない。各利用者の端末が閲覧分だけ取得）。
-THUMB_CACHE = ROOT / "images"
-IMAGES_DIR = THUMB_CACHE  # 後方互換
+THUMB_CACHE = IMAGES_DIR
 
 _thumb_session = requests.Session()
 _thumb_session.headers["User-Agent"] = USER_AGENT
