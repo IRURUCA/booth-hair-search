@@ -275,5 +275,7 @@ with gr.Blocks(title="BOOTH 髪型検索") as demo:
 
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860,
-                allowed_paths=[str(IMAGES_DIR)], inbrowser=True)  # 既定ブラウザで自動オープン
+    # server_port=None → 空きポートを自動探索（7860が使用中でも落ちない）。
+    # inbrowser=True → 選ばれたポートを既定ブラウザで自動オープン。
+    demo.launch(server_name="127.0.0.1", server_port=None,
+                allowed_paths=[str(IMAGES_DIR)], inbrowser=True)
