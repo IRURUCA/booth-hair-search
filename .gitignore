@@ -1,0 +1,30 @@
+# --- 重要: BOOTHの画像・キャッシュは配布(コミット)しない ---
+# サムネイルは各利用者の端末が表示時に取得するため、リポジトリには含めない。
+images/
+images_multi/
+cache/
+
+# Python 環境・生成物
+.venv/
+__pycache__/
+*.pyc
+
+# 実験用・アプリ未使用の中間生成物（配布に不要）
+data/hair_vectors_eva02.json
+data/hair_vectors_crop.json
+data/hair_vectors_multi*.json
+data/tags*.json
+data/multi_per_image.json
+data/product_meta.json
+data/product_avatars.json
+data/avatar_vocab.json
+data/avatar_aliases.json
+
+# 評価用の入力画像（各自で用意するもの。他者の画像を含みうるため配布しない）
+eval/
+
+# --- 配布する(コミットする)のは以下だけ ---
+# data/products.json       … 商品ID・名前・URL・価格・サムネURL（公開情報）
+# data/hair_vectors.json   … 検索用の髪形状タグベクトル
+# data/hair_vocab.json     … タグ語彙
+# data/product_stats.json  … スキ数・公開日（並び替え用）
