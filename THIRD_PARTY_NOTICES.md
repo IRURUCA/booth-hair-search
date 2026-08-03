@@ -3,6 +3,10 @@
 本ソフトウェアは以下のモデル・ライブラリを利用しています。各成果物の著作権は
 それぞれの権利者に帰属し、対応するライセンスの条件に従って利用しています。
 
+**配布パッケージ（zip）には `licenses/` フォルダとして、同梱される全パッケージ
+（下表の直接依存に加え、PyInstaller が取り込む間接依存を含む）のライセンス全文と
+著作権表示を収録しています**（`packaging/collect_licenses.py` がビルド時に生成）。
+
 ## モデル / Model
 
 ### WD Tagger v3 (SmilingWolf/wd-swinv2-tagger-v3)
@@ -13,7 +17,9 @@
   利用するのみで、学習画像そのものは含みません）
 - 入手元 / Source: https://huggingface.co/SmilingWolf/wd-swinv2-tagger-v3
 
-Apache License 2.0 の全文は http://www.apache.org/licenses/LICENSE-2.0 を参照。
+Apache License 2.0 の全文は、配布パッケージの
+`licenses/wd-tagger-v3-model.APACHE-2.0.txt`（または
+http://www.apache.org/licenses/LICENSE-2.0 ）を参照。
 
 ## Python ライブラリ / Python libraries
 
@@ -30,9 +36,10 @@ Apache License 2.0 の全文は http://www.apache.org/licenses/LICENSE-2.0 を�
 | pandas | BSD-3-Clause |
 | lxml | BSD-3-Clause |
 
-いずれも寛容型ライセンス（Apache-2.0 / MIT / BSD）です。各ライブラリの完全な
-ライセンス条文は、それぞれの配布物（`pip show <package>` や各プロジェクトの
-リポジトリ）を参照してください。
+いずれも寛容型ライセンス（Apache-2.0 / MIT / BSD）です。上表は主要な直接依存の
+一覧であり、**完全なライセンス条文は配布パッケージの `licenses/` フォルダ
+（間接依存を含む全パッケージ分）を参照してください**。ソースから実行する場合は
+各ライブラリの配布物（`pip show <package>` 等）を参照。
 
 ## データ / Data
 

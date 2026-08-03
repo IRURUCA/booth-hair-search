@@ -172,5 +172,6 @@ class HairMatcher:
                 "is_vrchat": looks_vrchat(p),
                 "avatars": sorted(self.product_avatars.get(pid, set())),
                 "wish": int(self.stats.get(pid, {}).get("wish", 0) or 0),
+                "published_at": self.stats.get(pid, {}).get("published_at") or "",
             })
         return out

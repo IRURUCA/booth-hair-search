@@ -13,6 +13,7 @@ from __future__ import annotations
 import html
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import gradio as gr
@@ -31,19 +32,20 @@ _thumb_session = requests.Session()
 _thumb_session.headers["User-Agent"] = USER_AGENT
 
 
-def _thumb_path(pid: str, url: str | None):
+def _thumb_path(pid: str, url: str | None, allow_fetch: bool = True):
     """サムネのローカルパスを返す。無ければ BOOTH(pximg) から取得してキャッシュ。
 
     取得は「閲覧のための都度取得」（クロールではない）。1商品につき1回だけ取得し、
     以後はキャッシュを使う。失敗したら None（呼び出し側はリンクにフォールバック）。
+    allow_fetch=False ならキャッシュのみ参照（回線不調時にUIを固めないため）。
     """
     dest = THUMB_CACHE / f"{pid}.jpg"
     if dest.exists() and dest.stat().st_size > 0:
         return str(dest)
-    if not url:
+    if not allow_fetch or not url or not url.startswith("https://"):
         return None
     try:
-        r = _thumb_session.get(url, timeout=15)
+        r = _thumb_session.get(url, timeout=8)
         if r.status_code == 200 and r.content:
             THUMB_CACHE.mkdir(parents=True, exist_ok=True)
             dest.write_bytes(r.content)
@@ -51,6 +53,14 @@ def _thumb_path(pid: str, url: str | None):
     except requests.RequestException:
         pass
     return None
+
+
+def _safe_url(r: dict) -> str:
+    """商品リンクを検証。http(s) 以外のスキームが紛れていたら BOOTH の正規URLへ。"""
+    url = r.get("url") or ""
+    if url.startswith("https://") or url.startswith("http://"):
+        return url
+    return f"https://booth.pm/ja/items/{r['product_id']}"
 
 print("最新DBを確認中...", file=sys.stderr)
 try:
@@ -109,11 +119,23 @@ def _sorted(results, sort):
             W_SIM * nrm(r["score"], smin, smax)
             + (1 - W_SIM) * nrm(math.log1p(r.get("wish") or 0), wmin, wmax)))
     if sort == "類似＋新着":
-        ids = [int(r["product_id"]) for r in results]
-        imin, imax = min(ids), max(ids)
+        # 公開日時（ISO8601, stats由来）で古→新に並べたランクを新しさスコアにする。
+        # 日時が無い商品は product_id 代理（IDはほぼ発行順）で日時あり商品より古い扱い。
+        # 生の値でなくランクを使うのは、日時(epoch秒)とIDのスケール差で正規化が壊れないため。
+        def order_key(r):
+            ts = r.get("published_at") or ""
+            if ts:
+                try:
+                    return (1, datetime.fromisoformat(ts).timestamp())
+                except ValueError:
+                    pass
+            return (0, float(int(r["product_id"])))
+        oldest_first = sorted(results, key=order_key)
+        rank = {r["product_id"]: i for i, r in enumerate(oldest_first)}
+        denom = max(1, len(results) - 1)
         return sorted(results, key=lambda r: -(
             W_SIM * nrm(r["score"], smin, smax)
-            + (1 - W_SIM) * nrm(int(r["product_id"]), imin, imax)))
+            + (1 - W_SIM) * rank[r["product_id"]] / denom))
     return results
 
 
@@ -127,19 +149,24 @@ def _render_page(results, page, sort="類似度順"):
     chunk = results[start:start + PER_PAGE]
 
     gallery, rows = [], []
+    fetch_fails = 0  # 2回続けて取得に失敗したら、このページ描画では以降キャッシュのみ
     for offset, r in enumerate(chunk):
         rank = start + offset + 1
         pid = r["product_id"]
-        img = _thumb_path(pid, r.get("thumbnail_url"))  # キャッシュ優先、無ければ都度取得
+        had_cache = (THUMB_CACHE / f"{pid}.jpg").exists()
+        img = _thumb_path(pid, r.get("thumbnail_url"), allow_fetch=fetch_fails < 2)
         if img:
             gallery.append((img, f"#{rank}  {r['score']:.2f}"))
+        elif (not had_cache and fetch_fails < 2
+              and (r.get("thumbnail_url") or "").startswith("https://")):
+            fetch_fails += 1  # 実際に取得を試みて失敗したときだけ数える
         wish = r.get("wish") or 0
         wish_cell = f"♡{wish:,}" if wish else "―"
         rows.append(
             f"<tr><td style='white-space:nowrap'>#{rank}</td>"
             f"<td style='white-space:nowrap'>{r['score']:.3f}</td>"
             f"<td style='white-space:nowrap'>{wish_cell}</td>"
-            f"<td><a href='{html.escape(r['url'])}' target='_blank'>{html.escape(r['name'])}</a></td></tr>"
+            f"<td><a href='{html.escape(_safe_url(r))}' target='_blank'>{html.escape(r['name'])}</a></td></tr>"
         )
     if total == 0:
         return [], "該当なし。タグの条件を緩めてください。"
