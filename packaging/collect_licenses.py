@@ -53,21 +53,42 @@ def main() -> None:
             lic = meta.get("Classifier") or "see license file"
         pkg_dir = OUT / f"{name}-{version}"
 
-        copied = 0
-        for f in (dist.files or []):
-            parts = f.parts
-            if not any(p.endswith(".dist-info") for p in parts):
-                continue
-            if not LICENSE_RE.match(f.name):
-                continue
-            src = dist.locate_file(f)
-            try:
-                if Path(src).is_file():
-                    pkg_dir.mkdir(exist_ok=True)
-                    shutil.copy(src, pkg_dir / f.name)
-                    copied += 1
-            except OSError:
-                pass
+        def try_copy(files) -> int:
+            n = 0
+            for f in files:
+                src = dist.locate_file(f)
+                try:
+                    if Path(src).is_file():
+                        pkg_dir.mkdir(exist_ok=True)
+                        shutil.copy(src, pkg_dir / f.name)
+                        n += 1
+                except OSError:
+                    pass
+            return n
+
+        all_files = list(dist.files or [])
+        # 1st: dist-info 内のライセンスファイル
+        copied = try_copy(
+            f for f in all_files
+            if any(p.endswith(".dist-info") for p in f.parts) and LICENSE_RE.match(f.name))
+        # 2nd: パッケージ本体に同梱されたもの（例: onnxruntime/LICENSE）
+        if not copied:
+            ok_suffix = {"", ".txt", ".md", ".rst", ".apache", ".bsd", ".mit"}
+            copied = try_copy(
+                f for f in all_files
+                if LICENSE_RE.match(f.stem or f.name) and f.suffix.lower() in ok_suffix)
+        # 3rd: Apache-2.0 表記のみでファイル無し → vendor した正文を参照する NOTICE を置く
+        if not copied and "apache" in lic.lower():
+            pkg_dir.mkdir(exist_ok=True)
+            author = meta.get("Author") or meta.get("Author-email") or ""
+            (pkg_dir / "NOTICE.txt").write_text(
+                f"{name} {version}\n"
+                f"License: {lic}\n"
+                + (f"Copyright: {author}\n" if author else "")
+                + "Full license text: ../wd-tagger-v3-model.APACHE-2.0.txt"
+                " (Apache License 2.0 の正文を同梱)\n",
+                encoding="utf-8")
+            copied = 1
 
         if copied:
             index_lines.append(f"- {name} {version} ({lic or 'license file included'})")
