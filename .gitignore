@@ -31,3 +31,5 @@ eval/
 model/
 dist/
 build/
+# ビルド時に packaging/collect_licenses.py が生成（配布zipには同梱）
+licenses/

@@ -32,6 +32,15 @@ datas += [
     (os.path.join(ROOT, "model", "selected_tags.csv"), "model"),
 ]
 
+# ライセンス文の同梱（Apache-2.0 §4(a)・MIT/BSD の再配布条件を満たすため必須）。
+# 無ければビルドを止める: 先に `python packaging/collect_licenses.py` を実行すること。
+LICENSES_DIR = os.path.join(ROOT, "licenses")
+if not os.path.isdir(LICENSES_DIR):
+    raise SystemExit(
+        "licenses/ がありません。先に `python packaging/collect_licenses.py` を実行してください。"
+    )
+datas += [(LICENSES_DIR, "licenses")]
+
 a = Analysis(
     [os.path.join(ROOT, "src", "step7_ui.py")],
     pathex=[os.path.join(ROOT, "src")],

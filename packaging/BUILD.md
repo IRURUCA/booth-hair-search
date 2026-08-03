@@ -10,7 +10,8 @@
 
 ## 方針
 
-- **同梱するもの**: `src/`、`data/*.json`（4ファイル）、WD Tagger モデル、依存ライブラリ
+- **同梱するもの**: `src/`、`data/*.json`（4ファイル）、WD Tagger モデル、依存ライブラリ、
+  `licenses/`（モデル・全依存のライセンス文。再配布条件のため必須）
 - **同梱しないもの**: `images/`（＝BOOTHサムネ。表示時に取得＆キャッシュ）、`cache/`、`.venv/`
 - 初回起動でモデルDLが走らないよう、**モデルもパッケージに含める**（オフラインでもタグ抽出可）
 
@@ -28,7 +29,20 @@ cp "$SNAP/selected_tags.csv" model/selected_tags.csv
 ```
 （`<hash>` は `snapshots/` 直下のフォルダ名。eva02(1.2GB)は同梱しないこと）
 
-## 2. PyInstaller でビルド（spec 使用・確認済み）
+## 2. ライセンス文を収集（配布の必須条件）
+
+同梱するモデル（Apache-2.0）・ライブラリ（MIT/BSD/Apache 等）は、**再配布時に
+ライセンス全文と著作権表示の添付が必要**（Apache-2.0 §4(a) など）。ビルド venv の
+全パッケージ（間接依存含む）から自動収集する:
+
+```bash
+# リポジトリ直下から実行 → licenses/ が生成される（spec が zip に同梱）
+python packaging/collect_licenses.py
+```
+
+「license file無し」と報告されたパッケージがあれば、配布前に表記を確認すること。
+
+## 3. PyInstaller でビルド（spec 使用・確認済み）
 
 ```bash
 pip install pyinstaller
@@ -41,7 +55,7 @@ pyinstaller packaging/booth-hair-search.spec --noconfirm --distpath dist --workp
 - 出力は `dist/booth-hair-search/`（フォルダ配布、約686MB）。`booth-hair-search.exe` を起動
 - 配布は `dist/booth-hair-search/` を zip して配る（例: GitHub Release にアップロード）
 
-## 3. 既知のハマりどころ
+## 4. 既知のハマりどころ
 
 - **Gradio が起動時に data files を探して FileNotFoundError** → `--collect-all gradio` を確認
 - **onnxruntime のネイティブDLLが見つからない** → `--collect-all onnxruntime`
@@ -57,8 +71,9 @@ pyinstaller packaging/booth-hair-search.spec --noconfirm --distpath dist --workp
   読み取り専用の同梱DB（初期ベクトル・モデル）と、書き込み可能なキャッシュ/更新DBを
   パスで分ける設計が必要。
 
-## 4. 動作確認チェックリスト
+## 5. 動作確認チェックリスト
 
+- [ ] `dist/booth-hair-search/licenses/` にライセンス文一式が入っている
 - [ ] `images/` が空の状態で起動できる
 - [ ] 画像アップ → タグ抽出（オフラインでも動く＝モデル同梱OK）
 - [ ] 検索 → サムネが表示される（＝表示時取得が動く、ネット必要）

@@ -33,8 +33,9 @@ MAX_RETRIES = 5
 BACKOFF_BASE = 2.0
 CONSECUTIVE_FAIL_LIMIT = 5  # これだけ連続で失敗したら止まって報告
 
-# robots.txt が Disallow しているパス接頭辞
+# robots.txt が Disallow しているパス接頭辞（実取得に失敗した場合のフォールバック）
 ROBOTS_DISALLOW = ("/terms", "/carts", "/cart")
+ROBOTS_URL = "https://booth.pm/robots.txt"
 
 ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = ROOT / "cache"
@@ -54,12 +55,35 @@ class BoothClient:
         self._consecutive_failures = 0
         HTML_CACHE.mkdir(parents=True, exist_ok=True)
         THUMB_CACHE.mkdir(parents=True, exist_ok=True)
+        self._robots_disallow = self._fetch_robots_disallow()
+
+    # --- robots.txt を実取得して Disallow 接頭辞を得る（失敗時はフォールバック）---
+    def _fetch_robots_disallow(self) -> tuple[str, ...]:
+        try:
+            resp = self.session.get(ROBOTS_URL, timeout=15)
+            if resp.status_code != 200:
+                return ROBOTS_DISALLOW
+            disallow: list[str] = []
+            applies = False  # 直前の User-agent 群に * が含まれるか
+            for raw in resp.text.splitlines():
+                line = raw.split("#", 1)[0].strip()
+                if not line or ":" not in line:
+                    continue
+                key, _, value = line.partition(":")
+                key, value = key.strip().lower(), value.strip()
+                if key == "user-agent":
+                    applies = value == "*"
+                elif key == "disallow" and applies and value:
+                    disallow.append(value)
+            # 空（＝全許可）もあり得るが、想定外の全消えはフォールバックの方が安全側
+            return tuple(disallow) or ROBOTS_DISALLOW
+        except requests.RequestException:
+            return ROBOTS_DISALLOW
 
     # --- robots.txt チェック ---
-    @staticmethod
-    def _robots_allows(url: str) -> bool:
+    def _robots_allows(self, url: str) -> bool:
         path = urlparse(url).path
-        return not any(path.startswith(p) for p in ROBOTS_DISALLOW)
+        return not any(path.startswith(p) for p in self._robots_disallow)
 
     # --- レート制御。直近リクエストから最低 MIN_INTERVAL 空ける ---
     def _throttle(self) -> None:
@@ -74,12 +98,18 @@ class BoothClient:
         return hashlib.sha256(url.encode("utf-8")).hexdigest()[:24]
 
     # --- HTML 取得（キャッシュ優先）---
-    def get_html(self, url: str) -> str:
+    def get_html(self, url: str, fresh: bool = False) -> str:
+        """URL の内容を返す。通常はキャッシュ優先（同じURLを二度取らない）。
+
+        fresh=True は鮮度が本質のURL（新着一覧・統計の再取得）用で、キャッシュを
+        読まずに取得し直す（結果はキャッシュへ上書き保存）。レート制御・バックオフは
+        通常時と同一で、負荷は増やさない。
+        """
         if not self._robots_allows(url):
             raise ValueError(f"robots.txt disallows this URL: {url}")
 
         cache_file = HTML_CACHE / f"{self._cache_key(url)}.html"
-        if cache_file.exists():
+        if not fresh and cache_file.exists():
             return cache_file.read_text(encoding="utf-8")
 
         text = self._get_with_backoff(url).text
@@ -101,18 +131,20 @@ class BoothClient:
             self._throttle()
             try:
                 resp = self.session.get(url, timeout=30)
-                if resp.status_code == 200:
-                    self._consecutive_failures = 0
-                    return resp
-                # 429/5xx はリトライ対象
-                if resp.status_code in (429, 500, 502, 503, 504):
-                    self._log(f"  HTTP {resp.status_code}, retrying ({attempt+1}/{MAX_RETRIES}): {url}")
-                else:
-                    # 404 等はリトライしても無駄
-                    resp.raise_for_status()
             except requests.RequestException as e:
                 self._log(f"  request error, retrying ({attempt+1}/{MAX_RETRIES}): {e}")
-            time.sleep(BACKOFF_BASE ** attempt + random.random())
+                time.sleep(BACKOFF_BASE ** attempt + random.random())
+                continue
+            if resp.status_code == 200:
+                self._consecutive_failures = 0
+                return resp
+            # 429/5xx はリトライ対象
+            if resp.status_code in (429, 500, 502, 503, 504):
+                self._log(f"  HTTP {resp.status_code}, retrying ({attempt+1}/{MAX_RETRIES}): {url}")
+                time.sleep(BACKOFF_BASE ** attempt + random.random())
+                continue
+            # 404 等はリトライしても無駄。連続失敗にも数えない（サーバー側の明確な回答）
+            resp.raise_for_status()
 
         # ここに来たら失敗
         self._consecutive_failures += 1
