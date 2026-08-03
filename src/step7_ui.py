@@ -275,4 +275,5 @@ with gr.Blocks(title="BOOTH 髪型検索") as demo:
 
 
 if __name__ == "__main__":
-    demo.launch(server_name="127.0.0.1", server_port=7860, allowed_paths=[str(IMAGES_DIR)])
+    demo.launch(server_name="127.0.0.1", server_port=7860,
+                allowed_paths=[str(IMAGES_DIR)], inbrowser=True)  # 既定ブラウザで自動オープン
