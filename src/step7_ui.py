@@ -273,8 +273,7 @@ def on_pick(page_pids, evt: gr.SelectData):
     url = _safe_url({"url": p.get("url"), "product_id": page_pids[evt.index]})
     name = html.escape(p.get("name", ""))
     return (
-        "<div style='padding:8px 12px;border:1px solid #4a90d9;border-radius:8px;"
-        "background:var(--background-fill-secondary,#eee);box-shadow:0 2px 8px rgba(0,0,0,.3)'>"
+        "<div style='padding:8px 10px;border:1px solid #4a90d9;border-radius:6px;margin:2px 0'>"
         f"🖼 選択中: <b>{name}</b>　"
         f"<a href='{html.escape(url)}' target='_blank'>🛒 BOOTHで開く ↗</a></div>"
     )
@@ -313,16 +312,7 @@ _PREVIEW_JS = """
 """
 
 
-# #pickbox は position:fixed の浮動バーにする（表示/非表示しても文書フローが動かない
-# ＝拡大の開閉でスクロール位置がずれるのを防ぐ）。lightboxより手前に出す。
-_CSS = """
-#pickbox { position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
-           z-index: 100000; max-width: 92vw; pointer-events: auto; }
-#pickbox:empty { display: none; }
-"""
-
-
-with gr.Blocks(title="画像から探す髪型検索ツール", css=_CSS) as demo:
+with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     gr.Markdown(
         "# 画像から探す髪型検索ツール\n"
         "アバターのスクショや髪型画像から、BOOTHの似た髪型商品を探します。\n"
