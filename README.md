@@ -27,11 +27,18 @@
 
 ## 機能
 
-- 髪型タグの**自動抽出＋手修正**（日本語カナ入力OK：`ツインテール`→`twintails` 等に自動変換）
+- **ハイブリッド類似検索**（v0.4.0〜）: 髪の形状タグに加えて画像全体の特徴も照合。
+  社内評価で「正解が10位以内に入る率」が **26%→52%** に向上
+- 髪型タグの**自動抽出＋手修正**（日本語OK：`ツインテール` `マッシュ` `オン眉` `みつあみ` など
+  約150語を自動変換。ひらがな／カタカナ／漢字の表記ゆれも吸収）
+- **キーワード絞り込み**: 商品名・BOOTHタグ・商品説明を検索（即反映）。
+  アバター名（例: `しなの`）で絞れば、**他のアバター向け商品のサムネから
+  自分のアバター対応の似た髪型を探す**、という使い方もできます
 - 「選択タグを含む商品だけ」に絞り込み
 - 並び替え：**類似度順 / 類似＋スキ / 類似＋新着**
 - 10 件ずつのページ送り、♡スキ数表示
-- 対象は BOOTH「3D髪型」カテゴリ 約 2,100 件（**自動で定期更新**）
+- 対象は BOOTH「3D髪型」カテゴリ 約 2,100 件（**自動で定期更新**。
+  検索DB・日本語辞書はアプリ起動時にも自動更新されます）
 
 ## データの取り扱い
 
@@ -58,10 +65,18 @@ python src/step7_ui.py
 
 初回はタグ推論モデル（WD Tagger v3, 約 400MB）を自動ダウンロードします。
 
-- 検索の中核: [`src/matcher.py`](src/matcher.py)（WD Tagger v3 + IDF 重み付きコサイン照合）
+- 検索の中核: [`src/matcher.py`](src/matcher.py)
+  （髪形状タグ+IDF コサイン × 全タグコサインのハイブリッド照合。評価は [`src/step15_hybrid_eval.py`](src/step15_hybrid_eval.py)）
 - UI: [`src/step7_ui.py`](src/step7_ui.py)（Gradio）
-- 差分更新: [`src/step13_update.py`](src/step13_update.py) を GitHub Actions が週1実行
-- 実行ファイルのビルド手順: [`packaging/BUILD.md`](packaging/BUILD.md)
+- 日本語同義語: [`src/hair_tags.py`](src/hair_tags.py) の組み込み辞書＋
+  [`data/jp_synonyms.json`](data/jp_synonyms.json)（**このJSONを main に push するだけで
+  全利用者の次回起動時に反映**。タグ名の妥当性は CI が検証）
+- 差分更新: [`src/step13_update.py`](src/step13_update.py) を GitHub Actions が週1実行。
+  語彙（許可リスト）を変更した場合は同じ Action が全ベクトルを自動再生成
+  （手動再生成は [`src/step14_rebuild_vectors.py`](src/step14_rebuild_vectors.py)）
+- テスト: `python tests/test_hair_tags.py`（PR/push で CI 自動実行）
+- リリース: GitHub Actions「Build & Release exe」を手動実行（version を入力）すると
+  ビルド〜起動テスト〜Release 作成まで自動。ローカルビルド手順は [`packaging/BUILD.md`](packaging/BUILD.md)
 
 ## ライセンス
 

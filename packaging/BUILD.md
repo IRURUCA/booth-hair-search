@@ -1,5 +1,11 @@
 # 配布パッケージのビルド手順（ノーセットアップ実行ファイル）
 
+> 🚀 **通常のリリースは GitHub Actions で自動化済み**（v0.4.0 から）。
+> Actions タブ →「Build & Release exe」→ version（例 `v0.5.0`）を入力して実行すると、
+> モデル取得 → ライセンス収集 → ビルド → exe 起動テスト → zip → Release 作成まで自動。
+> `dry_run=true` にすると Release を作らず Artifact に zip を置くだけ（動作確認用）。
+> 以下は**ローカルで手動ビルドする場合**の手順です。
+
 目標: **ダウンロードしてダブルクリックするだけ**で起動するローカルアプリ。
 セットアップ不要、サムネは表示時に BOOTH から取得（画像は同梱しない）。
 
@@ -10,7 +16,8 @@
 
 ## 方針
 
-- **同梱するもの**: `src/`、`data/*.json`（4ファイル）、WD Tagger モデル、依存ライブラリ、
+- **同梱するもの**: `src/`、`data/*.json`（6ファイル: products / hair_vectors / hair_vocab /
+  product_stats / jp_synonyms / full_vectors）、WD Tagger モデル、依存ライブラリ、
   `licenses/`（モデル・全依存のライセンス文。再配布条件のため必須）
 - **同梱しないもの**: `images/`（＝BOOTHサムネ。表示時に取得＆キャッシュ）、`cache/`、`.venv/`
 - 初回起動でモデルDLが走らないよう、**モデルもパッケージに含める**（オフラインでもタグ抽出可）
