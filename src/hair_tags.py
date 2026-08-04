@@ -15,6 +15,8 @@ armchair / armpit_hair / 色つき hairband など大量のノイズが混じる
 """
 from __future__ import annotations
 
+import unicodedata
+
 # 髪型の形状/長さ/結い方/分け目/質感を表すタグの許可リスト。
 # （Danbooru/WD v3 の実タグ名に合わせている。色・アクセサリ・体毛・動作は含めない）
 HAIR_SHAPE_ALLOWLIST = {
@@ -101,6 +103,12 @@ JP_SYNONYMS = {
     "ウェーブ": "wavy_hair", "ウェーブヘア": "wavy_hair", "波": "wavy_hair",
     "ストレート": "straight_hair", "さらさら": "straight_hair",
     "外ハネ": "flipped_hair", "はねる": "flipped_hair",
+    # 結び方の言い換え
+    "おさげ": "twin_braids", "お下げ": "twin_braids",
+    "二つ結び": "twintails", "ふたつ結び": "twintails",
+    "一つ結び": "ponytail", "ひとつ結び": "ponytail",
+    "サイド三つ編み": "side_braid", "横三つ編み": "side_braid",
+    "編みおろし": "single_braid", "編み下ろし": "single_braid",
     # 個別
     "姫カット": "hime_cut", "姫": "hime_cut", "ボブ": "bob_cut", "ボブカット": "bob_cut", "ショートボブ": "bob_cut",
     "アホ毛": "ahoge", "あほげ": "ahoge", "触角": "antenna_hair", "アンテナ": "antenna_hair", "触覚": "antenna_hair",
@@ -113,6 +121,57 @@ JP_SYNONYMS = {
 }
 
 
+# --- 表記ゆれ正規化 ---------------------------------------------------------
+# 「ツインみつあみ」「ツインミツアミ」「ツイン三つ編み」を同一視するため、
+# 入力と辞書キーの両方を同じ正規形（NFKC→小文字→カタカナ→形態素置換）に落とす。
+
+_HIRA_TO_KATA = {i: i + 0x60 for i in range(0x3041, 0x3097)}  # ぁ-ゖ → ァ-ヶ
+
+# カタカナ統一後の文字列に適用する形態素の正規化（かな表記→漢字かな交じりの正規形）。
+# 順序に意味がある: 長い/包含関係のあるパターンを先に置換する。
+_MORPH_CANON = [
+    ("ミツアミ", "三ツ編ミ"), ("三ツアミ", "三ツ編ミ"), ("ミツ編ミ", "三ツ編ミ"),
+    ("三ツ網", "三ツ編ミ"), ("3ツ編ミ", "三ツ編ミ"),
+    ("アミコミ", "編ミ込ミ"), ("編ミコミ", "編ミ込ミ"), ("アミ込ミ", "編ミ込ミ"),
+    ("ダンゴ", "団子"),
+    ("ヘアー", "ヘア"),
+]
+
+
+def normalize_ja(text: str) -> str:
+    """表記ゆれ吸収の正規形: NFKC → 小文字 → ひらがな→カタカナ → 形態素置換。"""
+    s = unicodedata.normalize("NFKC", text or "").lower().strip()
+    s = s.translate(_HIRA_TO_KATA)
+    for src, dst in _MORPH_CANON:
+        s = s.replace(src, dst)
+    return s
+
+
+# 正規形をキーにした同義語辞書（起動時に一度だけ構築）
+_JP_SYNONYMS_NORM = {normalize_ja(k): v for k, v in JP_SYNONYMS.items()}
+
+# 接頭辞 + 基本形状 → 複合タグ。「ツイン＋(三つ編み=braid)→twin_braids」のように、
+# 辞書に無い複合語を分解して解決する。キーは (正規形の接頭辞, 基本タグ)。
+_PREFIX_COMBOS = {
+    ("ツイン", "braid"): "twin_braids",
+    ("ツイン", "hair_bun"): "double_bun",
+    ("ツイン", "drill_hair"): "twin_drills",
+    ("ツイン", "ponytail"): "twintails",
+    ("ロー", "twintails"): "low_twintails", ("低", "twintails"): "low_twintails",
+    ("ロー", "ponytail"): "low_ponytail", ("低", "ponytail"): "low_ponytail",
+    ("ハイ", "ponytail"): "high_ponytail", ("高", "ponytail"): "high_ponytail",
+    ("ロー", "twin_braids"): "low_twin_braids", ("低", "twin_braids"): "low_twin_braids",
+    ("サイド", "braid"): "side_braid", ("横", "braid"): "side_braid",
+    ("サイド", "ponytail"): "side_ponytail",
+    ("サイド", "hair_bun"): "single_side_bun",
+    ("片", "hair_bun"): "single_hair_bun",
+    ("両", "hair_bun"): "double_bun",
+    ("両", "braid"): "twin_braids",
+    ("一本", "braid"): "single_braid",
+}
+_COMBO_PREFIXES = sorted({p for p, _ in _PREFIX_COMBOS}, key=len, reverse=True)
+
+
 def is_hair_shape_tag(tag: str) -> bool:
     """そのタグが髪の形状/長さ/質感タグ（許可リスト内）なら True。"""
     return tag in HAIR_SHAPE_ALLOWLIST
@@ -121,7 +180,8 @@ def is_hair_shape_tag(tag: str) -> bool:
 def resolve_tag(token: str, vocab) -> str | None:
     """ユーザー入力トークンを WD形状タグに解決する。無理なら None。
 
-    優先順: 完全一致 → 同義語辞書 → 空白をアンダースコアに → 部分一致（あいまい補完）。
+    優先順: 完全一致 → 同義語辞書（表記ゆれ正規化込み）→ 接頭辞合成
+    → 空白をアンダースコアに → 部分一致（あいまい補完）。
     """
     vocab_set = set(vocab)
     t = token.strip()
@@ -131,10 +191,19 @@ def resolve_tag(token: str, vocab) -> str | None:
         return t
     if t in JP_SYNONYMS:
         return JP_SYNONYMS[t]
-    low = t.lower().strip()
-    if low in JP_SYNONYMS:
-        return JP_SYNONYMS[low]
-    us = low.replace(" ", "_").replace("-", "_")
+    norm = normalize_ja(t)
+    if norm in _JP_SYNONYMS_NORM:
+        return _JP_SYNONYMS_NORM[norm]
+    # 接頭辞合成: 「ツイン＋みつあみ」のような辞書に無い複合語を分解して解決
+    for prefix in _COMBO_PREFIXES:
+        if norm.startswith(prefix) and len(norm) > len(prefix):
+            rest = _JP_SYNONYMS_NORM.get(norm[len(prefix):])
+            if rest:
+                combined = _PREFIX_COMBOS.get((prefix, rest))
+                if combined:
+                    return combined
+                return rest  # 合成先が無ければ基本形状だけでも返す
+    us = norm.replace(" ", "_").replace("-", "_")
     if us in vocab_set:
         return us
     # あいまい: 入力がタグの部分文字列（またはその逆）で最短一致

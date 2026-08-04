@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-from hair_tags import build_hair_vocab, resolve_tag
+from hair_tags import build_hair_vocab, normalize_ja, resolve_tag
 from paths import (BUNDLE_MODEL_DIR, BUNDLE_ROOT, HF_CACHE, data_file,
                    has_bundled_model)
 from wd_tagger import WDTagger
@@ -56,11 +56,11 @@ class HairMatcher:
         stats_f = data_file("product_stats.json")
         if stats_f.exists():
             self.stats = json.loads(stats_f.read_text(encoding="utf-8"))
-        # 商品ごとのBOOTHタグ（小文字化）。商品名＋タグのキーワード検索に使う。
-        self.product_tags = {pid: [str(t).lower() for t in (s.get("tags") or [])]
+        # 商品ごとのBOOTHタグ（表記ゆれ正規化済み）。商品名＋タグのキーワード検索に使う。
+        self.product_tags = {pid: [normalize_ja(str(t)) for t in (s.get("tags") or [])]
                              for pid, s in self.stats.items()}
-        # 概要欄（小文字化）。キーワード検索のみに使い、表示はしない。
-        self.product_desc = {pid: str(s.get("desc") or "").lower()
+        # 概要欄（表記ゆれ正規化済み）。キーワード検索のみに使い、表示はしない。
+        self.product_desc = {pid: normalize_ja(str(s.get("desc") or ""))
                              for pid, s in self.stats.items()}
         hv = json.loads(data_file("hair_vectors.json").read_text(encoding="utf-8"))
 
@@ -151,9 +151,13 @@ class HairMatcher:
         return any(v.get(t, 0.0) >= thresh for t in tags)
 
     def keyword_hit(self, pid: str, name: str, kw: str) -> bool:
-        """キーワードが 商品名 / BOOTHタグ / 概要欄 のいずれかに含まれるか（アバター名検索用）。"""
-        kw = kw.lower()
-        if kw in (name or "").lower():
+        """キーワードが 商品名 / BOOTHタグ / 概要欄 のいずれかに含まれるか（アバター名検索用）。
+
+        両辺を normalize_ja で正規化して比較するので、「みつあみ」でも
+        商品側の「三つ編み」にヒットする（ひらがな/カタカナ/漢字の表記ゆれ吸収）。
+        """
+        kw = normalize_ja(kw)
+        if kw in normalize_ja(name or ""):
             return True
         if any(kw in t for t in self.product_tags.get(pid, ())):
             return True
