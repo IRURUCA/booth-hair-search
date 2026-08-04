@@ -215,6 +215,55 @@ _PREFIX_COMBOS = {
 _COMBO_PREFIXES = sorted({p for p, _ in _PREFIX_COMBOS}, key=len, reverse=True)
 
 
+def load_external_dict(path) -> int:
+    """外部辞書 data/jp_synonyms.json を組み込み辞書にマージする。
+
+    辞書追加を exe の再リリースなしで配るための仕組み。このファイルは
+    db_update の同期対象なので、GitHub の main に push すれば次回起動時に
+    全クライアントへ届く。形式:
+
+        {"synonyms":      {"片側上げ": "asymmetrical_bangs", ...},
+         "morph_canon":   [["オンマユ", "オン眉"], ...],
+         "prefix_combos": {"ツイン|braid": "twin_braids", ...}}
+
+    戻り値: 取り込んだエントリ数。ファイルが無い/壊れていれば 0（組み込みのみで動作）。
+    """
+    import json
+    from pathlib import Path
+
+    p = Path(path)
+    if not p.exists():
+        return 0
+    try:
+        d = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return 0
+    n = 0
+    for src, dst in d.get("morph_canon") or []:
+        pair = (str(src), str(dst))
+        if pair not in _MORPH_CANON:
+            _MORPH_CANON.append(pair)
+            n += 1
+    for k, v in (d.get("synonyms") or {}).items():
+        if JP_SYNONYMS.get(k) != v:
+            JP_SYNONYMS[k] = str(v)
+            n += 1
+    for key, combined in (d.get("prefix_combos") or {}).items():
+        try:
+            prefix, base = str(key).split("|", 1)
+        except ValueError:
+            continue
+        if _PREFIX_COMBOS.get((prefix, base)) != combined:
+            _PREFIX_COMBOS[(prefix, base)] = str(combined)
+            n += 1
+    if n:
+        # 形態素置換が増えた可能性があるので、正規形キーの辞書を作り直す
+        _JP_SYNONYMS_NORM.clear()
+        _JP_SYNONYMS_NORM.update({normalize_ja(k): v for k, v in JP_SYNONYMS.items()})
+        _COMBO_PREFIXES[:] = sorted({pf for pf, _ in _PREFIX_COMBOS}, key=len, reverse=True)
+    return n
+
+
 def is_hair_shape_tag(tag: str) -> bool:
     """そのタグが髪の形状/長さ/質感タグ（許可リスト内）なら True。"""
     return tag in HAIR_SHAPE_ALLOWLIST

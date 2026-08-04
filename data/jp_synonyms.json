@@ -1,0 +1,11 @@
+{
+  "_comment": "日本語同義語の外部辞書。ここに追加して main に push すると、次回起動時の DB 同期で全クライアントに配られる（exe の再リリース不要）。synonyms: 日本語→WDタグ / morph_canon: カタカナ正規形の置換ペア / prefix_combos: '接頭辞|基本タグ'→複合タグ。組み込み辞書（src/hair_tags.py）への上書きマージ。",
+  "synonyms": {
+    "片側上げ": "asymmetrical_bangs",
+    "片上げ": "asymmetrical_bangs",
+    "片側かき上げ": "asymmetrical_bangs",
+    "片側前髪上げ": "asymmetrical_bangs"
+  },
+  "morph_canon": [],
+  "prefix_combos": {}
+}
