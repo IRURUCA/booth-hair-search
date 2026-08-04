@@ -297,16 +297,23 @@ _PREVIEW_JS = """
     if (!url) return;
     const cap = [...preview.querySelectorAll('*')].find(
       el => el.children.length === 0 && /^\\s*#\\d/.test(el.textContent || ''));
-    if (cap && !cap.querySelector('a')) {
-      const link = document.createElement('a');
-      link.href = url; link.target = '_blank';
-      link.style.color = 'inherit'; link.style.textDecoration = 'underline';
-      link.textContent = cap.textContent;
-      cap.textContent = '';
-      cap.appendChild(link);
+    if (!cap) return;
+    if (cap.tagName === 'A') {
+      // リンク化済み: 拡大中に別サムネへ切り替えた場合に備え href を追従させる
+      if (cap.getAttribute('href') !== url) cap.setAttribute('href', url);
+      return;
     }
+    const link = document.createElement('a');
+    link.href = url; link.target = '_blank';
+    link.style.color = 'inherit'; link.style.textDecoration = 'underline';
+    // テキストノードを作り直さず<a>内へ移動する（Svelteのテキスト更新を生かし、
+    // 拡大中に別サムネへ切り替えたときキャプション文言が古いまま残るのを防ぐ）
+    while (cap.firstChild) link.appendChild(cap.firstChild);
+    cap.appendChild(link);
   };
   new MutationObserver(sync).observe(gal, {childList: true, subtree: true, attributes: true});
+  // 選択商品のリンクは on_pick の応答で遅れて #pickbox に入るため、こちらの変化でも再実行する
+  new MutationObserver(sync).observe(box, {childList: true, subtree: true});
   sync();
 }
 """
