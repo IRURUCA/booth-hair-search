@@ -30,6 +30,8 @@ jobs:
   build:
     runs-on: windows-latest
     timeout-minutes: 90
+    env:
+      PYTHONUTF8: "1"  # ランナーのcp1252コンソールで日本語printが落ちるのを防ぐ
     defaults:
       run:
         shell: pwsh
