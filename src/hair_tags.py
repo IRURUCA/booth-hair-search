@@ -125,6 +125,10 @@ JP_SYNONYMS = {
     "カーテンバング": "curtained_hair", "アーチ前髪": "arched_bangs",
     "クロス前髪": "crossed_bangs", "交差前髪": "crossed_bangs",
     "ギザギザ前髪": "choppy_bangs", "アシメ前髪": "asymmetrical_bangs",
+    # 「片側だけ前髪が上がってる」スタイル。専用のWDタグが無いため
+    # 最も近い asymmetrical_bangs に寄せる（swept_bangs 併用を推奨）
+    "片側上げ": "asymmetrical_bangs", "片上げ": "asymmetrical_bangs",
+    "片側かき上げ": "asymmetrical_bangs", "片側前髪上げ": "asymmetrical_bangs",
     "編み込み前髪": "braided_bangs", "切りっぱなし": "blunt_ends",
     # 質感・スタイル
     "オールバック": "hair_slicked_back", "かきあげ": "hair_pulled_back",
