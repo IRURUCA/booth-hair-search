@@ -56,6 +56,9 @@ class HairMatcher:
         stats_f = data_file("product_stats.json")
         if stats_f.exists():
             self.stats = json.loads(stats_f.read_text(encoding="utf-8"))
+        # 商品ごとのBOOTHタグ（小文字化）。商品名＋タグのキーワード検索に使う。
+        self.product_tags = {pid: [str(t).lower() for t in (s.get("tags") or [])]
+                             for pid, s in self.stats.items()}
         hv = json.loads(data_file("hair_vectors.json").read_text(encoding="utf-8"))
 
         self.pids = [pid for pid in hv if pid in self.product_by_id]
@@ -143,6 +146,13 @@ class HairMatcher:
         """商品 pid が、指定タグのいずれかを thresh 以上で持つか。"""
         v = self.hair_vectors.get(pid, {})
         return any(v.get(t, 0.0) >= thresh for t in tags)
+
+    def keyword_hit(self, pid: str, name: str, kw: str) -> bool:
+        """キーワードが商品名 または BOOTHタグ に含まれるか（アバター名検索用）。"""
+        kw = kw.lower()
+        if kw in (name or "").lower():
+            return True
+        return any(kw in t for t in self.product_tags.get(pid, ()))
 
     def extract_hair_tags(self, image_path: str, thresh: float = 0.2) -> dict[str, float]:
         """画像から髪形状タグ(>=thresh)を確信度つきで返す（降順）。"""

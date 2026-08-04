@@ -218,9 +218,10 @@ def _filtered(results, tag_only, selected_tags, keyword=""):
     out = results or []
     if tag_only and selected_tags:
         out = [r for r in out if MATCHER.contains_any(r["product_id"], selected_tags)]
-    kw = (keyword or "").strip().lower()
+    kw = (keyword or "").strip()
     if kw:
-        out = [r for r in out if kw in (r.get("name") or "").lower()]
+        # 商品名だけでなくBOOTHタグも見る（アバター名は名前に無くタグにある事が多い）
+        out = [r for r in out if MATCHER.keyword_hit(r["product_id"], r.get("name") or "", kw)]
     return out
 
 
@@ -312,8 +313,8 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
                 info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
             )
             keyword = gr.Textbox(
-                label="商品名でさらに絞り込み（任意・キーワード）",
-                placeholder="例: ウルフ / bob / ロング（商品名に含まれる語。即反映）",
+                label="キーワードでさらに絞り込み（任意）",
+                placeholder="例: ウルフ / アバター名（しなの等）/ bob（商品名・BOOTHタグを検索・即反映）",
             )
             with gr.Row():
                 prev_btn = gr.Button("◀ 前の10件", scale=1)
