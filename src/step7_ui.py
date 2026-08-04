@@ -301,19 +301,16 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
                 info="「ツインテール」「ボブ」「みつあみ」等の日本語で入れても自動変換します。",
             )
             tag_note = gr.Markdown()
+            tag_only = gr.Checkbox(
+                label="選択タグを含む商品だけ", value=False,
+                info="ONで選んだタグを1つも持たない商品を除外（即反映）。",
+            )
             search_btn = gr.Button("② 検索", variant="primary")
         with gr.Column(scale=2):
-            with gr.Row():
-                sort = gr.Radio(
-                    choices=["類似度順", "類似＋スキ", "類似＋新着"], value="類似度順", label="並び順",
-                    info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
-                    scale=2,
-                )
-                tag_only = gr.Checkbox(
-                    label="選択タグを含む商品だけ", value=False,
-                    info="ONで選んだタグを1つも持たない商品を除外（即反映）。",
-                    scale=1,
-                )
+            sort = gr.Radio(
+                choices=["類似度順", "類似＋スキ", "類似＋新着"], value="類似度順", label="並び順",
+                info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
+            )
             keyword = gr.Textbox(
                 label="商品名でさらに絞り込み（任意・キーワード）",
                 placeholder="例: ウルフ / bob / ロング（商品名に含まれる語。即反映）",
