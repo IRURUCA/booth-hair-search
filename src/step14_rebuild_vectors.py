@@ -9,7 +9,9 @@ hair_tags.py の HAIR_SHAPE_ALLOWLIST を変えたときに実行する。
 - 50件ごとにチェックポイント保存。途中で止めても再実行すれば続きから
   （--resume 時: 新語彙で既にタグ済みのものはスキップ）
 
-使い方: python src/step14_rebuild_vectors.py [--resume]
+使い方: python src/step14_rebuild_vectors.py [--resume] [--if-changed]
+  --if-changed: 語彙が data/hair_vocab.json から変わっていなければ何もせず終了
+                （毎週のGitHub Actionsから呼ぶ用。語彙変更時だけ全再生成が走る）
 """
 from __future__ import annotations
 
@@ -44,6 +46,9 @@ def main() -> None:
     removed = sorted(old_vocab - set(vocab))
     print(f"語彙: {len(old_vocab)} → {len(vocab)} (追加 {added or 'なし'} / 削除 {removed or 'なし'})",
           file=sys.stderr, flush=True)
+    if "--if-changed" in sys.argv and not added and not removed:
+        print("語彙変更なし。再生成をスキップ。", file=sys.stderr)
+        return
     HAIR_VOCAB_FILE.write_text(json.dumps(vocab, ensure_ascii=False, indent=2), encoding="utf-8")
 
     # 進捗はサイドカーに持つ（ベクトルの中身からは「新語彙で済み」を判定できないため）
