@@ -24,7 +24,7 @@ import requests
 from booth_client import BoothClient, CrawlStop
 from hair_tags import build_hair_vocab
 from step1_crawl_listings import CATEGORY_URL, parse_listing_page
-from step11_stats import parse_price
+from step11_stats import extract_tags, parse_price, strip_desc
 from wd_tagger import WDTagger
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -48,6 +48,8 @@ def _fetch_stats(client: BoothClient, pid: str, fresh: bool = False) -> dict:
         "wish": int(d.get("wish_lists_count") or 0),
         "published_at": d.get("published_at") or "",
         "price": parse_price(d.get("price")),
+        "tags": extract_tags(d),  # 商品名＋タグのキーワード検索用
+        "desc": strip_desc(d),    # 概要欄（キーワード検索用・非表示）
         "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
 

@@ -148,7 +148,7 @@ def _render_page(results, page, sort="類似度順"):
     start = (page - 1) * PER_PAGE
     chunk = results[start:start + PER_PAGE]
 
-    gallery, rows = [], []
+    gallery, rows, page_pids = [], [], []
     fetch_fails = 0  # 2回続けて取得に失敗したら、このページ描画では以降キャッシュのみ
     for offset, r in enumerate(chunk):
         rank = start + offset + 1
@@ -156,7 +156,9 @@ def _render_page(results, page, sort="類似度順"):
         had_cache = (THUMB_CACHE / f"{pid}.jpg").exists()
         img = _thumb_path(pid, r.get("thumbnail_url"), allow_fetch=fetch_fails < 2)
         if img:
-            gallery.append((img, f"#{rank}  {r['score']:.2f}"))
+            # キャプションは商品名フル（小タイルは見切れる／拡大表示で全部見える）
+            gallery.append((img, f"#{rank} {r['name']}"))
+            page_pids.append(pid)  # ギャラリー表示順のIDを記録（クリック→商品特定に使う）
         elif (not had_cache and fetch_fails < 2
               and (r.get("thumbnail_url") or "").startswith("https://")):
             fetch_fails += 1  # 実際に取得を試みて失敗したときだけ数える
@@ -169,7 +171,7 @@ def _render_page(results, page, sort="類似度順"):
             f"<td><a href='{html.escape(_safe_url(r))}' target='_blank'>{html.escape(r['name'])}</a></td></tr>"
         )
     if total == 0:
-        return [], "該当なし。タグの条件を緩めてください。"
+        return [], "該当なし。タグやキーワードの条件を緩めてください。", []
     header = (f"<b>{total}件中 {start + 1}〜{min(start + PER_PAGE, total)}位</b>"
               f"　（ページ {page} / {npages}）")
     table_html = (
@@ -177,10 +179,10 @@ def _render_page(results, page, sort="類似度順"):
         "<table style='width:100%;border-collapse:collapse' border='1' cellpadding='4'>"
         "<tr><th>順位</th><th>類似</th><th>スキ</th><th style='width:80%'>商品名（クリックでBOOTH）</th></tr>"
         + "".join(rows) + "</table>"
-        "<p style='color:#888;font-size:0.85em'>※ 類似スコアは「見つけた確度」ではありません"
-        "（似た候補ほど高く出るだけ。人が目で選んでください）。</p>"
+        "<p style='color:#888;font-size:0.85em'>※ サムネ（左）をクリックすると、その商品のBOOTHリンクが上に出ます。"
+        "類似スコアは「見つけた確度」ではありません（人が目で選んでください）。</p>"
     )
-    return gallery, table_html
+    return gallery, table_html, page_pids
 
 
 def on_tags_change(selected_tags):
@@ -208,18 +210,25 @@ def on_tags_change(selected_tags):
     return gr.update(value=final), msg
 
 
-def _filtered(results, tag_only, selected_tags):
-    """タグ絞り込みを表示時に適用（Stateには常に全ランキングを保持）。"""
-    if not tag_only or not selected_tags:
-        return results or []
-    return [r for r in (results or [])
-            if MATCHER.contains_any(r["product_id"], selected_tags)]
+def _filtered(results, tag_only, selected_tags, keyword=""):
+    """表示時の絞り込み（Stateには常に全ランキングを保持）。
+    - tag_only: 選択タグを1つも持たない商品を除外
+    - keyword: 商品名に含まれる語で絞り込み（大小文字・全半角は区別せずゆるめに）
+    """
+    out = results or []
+    if tag_only and selected_tags:
+        out = [r for r in out if MATCHER.contains_any(r["product_id"], selected_tags)]
+    kw = (keyword or "").strip()
+    if kw:
+        # 商品名だけでなくBOOTHタグも見る（アバター名は名前に無くタグにある事が多い）
+        out = [r for r in out if MATCHER.keyword_hit(r["product_id"], r.get("name") or "", kw)]
+    return out
 
 
-def on_search(selected_tags, detected, tag_only, sort):
+def on_search(selected_tags, detected, tag_only, sort, keyword):
     """検索してランキング全体を State に入れ、1ページ目を描画。ページ選択肢も更新。"""
     if not selected_tags:
-        return [], gr.update(choices=[1], value=1), [], "タグを1つ以上選んでください。"
+        return [], gr.update(choices=[1], value=1), [], "タグを1つ以上選んでください。", []
     detected = detected or {}
     # クエリ組み立て: 弱いタグ(検出済み<0.2)はそのまま照合に使う。
     #   ユーザーが外した強タグは除外、足したタグは確信度1.0。
@@ -233,33 +242,81 @@ def on_search(selected_tags, detected, tag_only, sort):
             query[t] = 1.0  # ユーザーが手で足した
     # DBにある限り全件をランキング（ページで手繰れるように）。絞り込みは表示時に適用
     pool = MATCHER.search(query, top_k=len(MATCHER.pids))
-    view = _filtered(pool, tag_only, selected_tags)
+    view = _filtered(pool, tag_only, selected_tags, keyword)
     npages = _num_pages(len(view))
-    gallery, table_html = _render_page(view, 1, sort)
-    return pool, gr.update(choices=list(range(1, npages + 1)), value=1), gallery, table_html
+    gallery, table_html, pids = _render_page(view, 1, sort)
+    return pool, gr.update(choices=list(range(1, npages + 1)), value=1), gallery, table_html, pids
 
 
-def goto(results, page, sort, tag_only, selected_tags):
+def goto(results, page, sort, tag_only, selected_tags, keyword):
     """State のランキングから指定ページを描画（◀▶・ページ選択の共通処理）。"""
-    view = _filtered(results, tag_only, selected_tags)
+    view = _filtered(results, tag_only, selected_tags, keyword)
     npages = _num_pages(len(view))
     page = max(1, min(int(page), npages))
-    gallery, table_html = _render_page(view, page, sort)
-    return gr.update(value=page), gallery, table_html
+    gallery, table_html, pids = _render_page(view, page, sort)
+    return gr.update(value=page), gallery, table_html, pids
 
 
-def on_sort(results, sort, tag_only, selected_tags):
-    """並び順を変えたら1ページ目に戻して再描画。"""
-    gallery, table_html = _render_page(_filtered(results, tag_only, selected_tags), 1, sort)
-    return gr.update(value=1), gallery, table_html
-
-
-def on_toggle_filter(results, tag_only, selected_tags, sort):
-    """絞り込みチェックの切り替えを即反映（再検索なし）。ページ数も更新して1ページ目へ。"""
-    view = _filtered(results, tag_only, selected_tags)
+def on_redisplay(results, tag_only, selected_tags, sort, keyword):
+    """並び順・絞り込み・キーワードの変更を即反映（再検索なし）。1ページ目へ。"""
+    view = _filtered(results, tag_only, selected_tags, keyword)
     npages = _num_pages(len(view))
-    gallery, table_html = _render_page(view, 1, sort)
-    return gr.update(choices=list(range(1, npages + 1)), value=1), gallery, table_html
+    gallery, table_html, pids = _render_page(view, 1, sort)
+    return gr.update(choices=list(range(1, npages + 1)), value=1), gallery, table_html, pids
+
+
+def on_pick(page_pids, evt: gr.SelectData):
+    """サムネクリック→その商品のBOOTHリンクを上部に表示（どのサムネがどれか明確に）。"""
+    if not page_pids or evt.index is None or evt.index >= len(page_pids):
+        return ""
+    p = MATCHER.product_by_id.get(page_pids[evt.index], {})
+    url = _safe_url({"url": p.get("url"), "product_id": page_pids[evt.index]})
+    name = html.escape(p.get("name", ""))
+    return (
+        "<div style='padding:8px 10px;border:1px solid #4a90d9;border-radius:6px;margin:2px 0'>"
+        f"🖼 選択中: <b>{name}</b>　"
+        f"<a href='{html.escape(url)}' target='_blank'>🛒 BOOTHで開く ↗</a></div>"
+    )
+
+
+# サムネ拡大(lightbox)が開いている間だけ #pickbox を表示するJS。
+# Gradioに拡大の開閉イベントが無いため、ギャラリー内に拡大ビュー(.preview)が
+# 出現/消滅するのをMutationObserverで監視して display を切り替える。
+_PREVIEW_JS = """
+() => {
+  const box = document.getElementById('pickbox');
+  const gal = document.getElementById('cand_gallery');
+  if (!box || !gal) return;
+  const sync = () => {
+    const preview = gal.querySelector('.preview');
+    box.style.display = preview ? '' : 'none';
+    if (!preview) return;
+    // 拡大表示の下に出る「#N 商品名」キャプションもハイパーリンク化する
+    const a = box.querySelector('a');
+    const url = a ? a.getAttribute('href') : null;
+    if (!url) return;
+    const cap = [...preview.querySelectorAll('*')].find(
+      el => el.children.length === 0 && /^\\s*#\\d/.test(el.textContent || ''));
+    if (!cap) return;
+    if (cap.tagName === 'A') {
+      // リンク化済み: 拡大中に別サムネへ切り替えた場合に備え href を追従させる
+      if (cap.getAttribute('href') !== url) cap.setAttribute('href', url);
+      return;
+    }
+    const link = document.createElement('a');
+    link.href = url; link.target = '_blank';
+    link.style.color = 'inherit'; link.style.textDecoration = 'underline';
+    // テキストノードを作り直さず<a>内へ移動する（Svelteのテキスト更新を生かし、
+    // 拡大中に別サムネへ切り替えたときキャプション文言が古いまま残るのを防ぐ）
+    while (cap.firstChild) link.appendChild(cap.firstChild);
+    cap.appendChild(link);
+  };
+  new MutationObserver(sync).observe(gal, {childList: true, subtree: true, attributes: true});
+  // 選択商品のリンクは on_pick の応答で遅れて #pickbox に入るため、こちらの変化でも再実行する
+  new MutationObserver(sync).observe(box, {childList: true, subtree: true});
+  sync();
+}
+"""
 
 
 with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
@@ -270,6 +327,7 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     )
     detected_state = gr.State({})
     results_state = gr.State([])
+    page_pids_state = gr.State([])  # 現在ギャラリーに出ている商品IDの並び（クリック特定用）
     with gr.Row():
         with gr.Column(scale=1):
             image = gr.Image(
@@ -284,46 +342,53 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
                 info="「ツインテール」「ボブ」「みつあみ」等の日本語で入れても自動変換します。",
             )
             tag_note = gr.Markdown()
+            tag_only = gr.Checkbox(
+                label="選択タグを含む商品だけ", value=False,
+                info="ONで選んだタグを1つも持たない商品を除外（即反映）。",
+            )
             search_btn = gr.Button("② 検索", variant="primary")
         with gr.Column(scale=2):
-            with gr.Row():
-                sort = gr.Radio(
-                    choices=["類似度順", "類似＋スキ", "類似＋新着"], value="類似度順", label="並び順",
-                    info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
-                    scale=2,
-                )
-                tag_only = gr.Checkbox(
-                    label="選択タグを含む商品だけ", value=False,
-                    info="ONで選んだタグを1つも持たない商品を除外（即反映）。",
-                    scale=1,
-                )
+            sort = gr.Radio(
+                choices=["類似度順", "類似＋スキ", "類似＋新着"], value="類似度順", label="並び順",
+                info="複合順=似た候補の中で、人気(スキ数)や新しさを加味して並べ替え。",
+            )
+            keyword = gr.Textbox(
+                label="キーワードでさらに絞り込み（任意）",
+                placeholder="例: ウルフ / アバター名（しなの等）/ bob（商品名・BOOTHタグを検索・即反映）",
+            )
             with gr.Row():
                 prev_btn = gr.Button("◀ 前の10件", scale=1)
                 page_dd = gr.Dropdown(choices=[1], value=1, label="ページ (10件ずつ)", scale=2)
                 next_btn = gr.Button("次の10件 ▶", scale=1)
+            # サムネ拡大中だけ表示（下部のload JSがlightbox開閉を監視して出し入れ）
+            pick_html = gr.HTML(elem_id="pickbox")
             # height固定だとギャラリー内スクロールが発生して1段目が切れる → 自動高さで
-            # 2行(10件)を丸ごと表示する
-            gallery = gr.Gallery(label="候補", columns=5, rows=2, height="auto",
-                                 object_fit="cover")
+            # 2行(10件)を丸ごと表示する。キャプションに商品名を出す
+            gallery = gr.Gallery(label="候補（サムネクリックでリンク表示）", columns=5, rows=2,
+                                 height="auto", object_fit="cover",
+                                 buttons=["download", "fullscreen"],  # share は消す
+                                 elem_id="cand_gallery")
             result_html = gr.HTML()
+
+    redisplay_in = [results_state, tag_only, tags, sort, keyword]
+    redisplay_out = [page_dd, gallery, result_html, page_pids_state]
+    goto_in = [results_state, page_dd, sort, tag_only, tags, keyword]
 
     extract_btn.click(on_extract, [image], [tags, detected_state, info])
     image.upload(on_extract, [image], [tags, detected_state, info])
     tags.change(on_tags_change, [tags], [tags, tag_note])
-    search_btn.click(on_search, [tags, detected_state, tag_only, sort],
-                     [results_state, page_dd, gallery, result_html])
-    sort.change(on_sort, [results_state, sort, tag_only, tags],
-                [page_dd, gallery, result_html])
-    tag_only.change(on_toggle_filter, [results_state, tag_only, tags, sort],
-                    [page_dd, gallery, result_html])
-    page_dd.change(goto, [results_state, page_dd, sort, tag_only, tags],
-                   [page_dd, gallery, result_html])
-    prev_btn.click(lambda res, p, s, f, t: goto(res, int(p) - 1, s, f, t),
-                   [results_state, page_dd, sort, tag_only, tags],
-                   [page_dd, gallery, result_html])
-    next_btn.click(lambda res, p, s, f, t: goto(res, int(p) + 1, s, f, t),
-                   [results_state, page_dd, sort, tag_only, tags],
-                   [page_dd, gallery, result_html])
+    search_btn.click(on_search, [tags, detected_state, tag_only, sort, keyword],
+                     [results_state, page_dd, gallery, result_html, page_pids_state])
+    sort.change(on_redisplay, redisplay_in, redisplay_out)
+    tag_only.change(on_redisplay, redisplay_in, redisplay_out)
+    keyword.change(on_redisplay, redisplay_in, redisplay_out)
+    page_dd.change(goto, goto_in, [page_dd, gallery, result_html, page_pids_state])
+    prev_btn.click(lambda res, p, s, f, t, k: goto(res, int(p) - 1, s, f, t, k),
+                   goto_in, [page_dd, gallery, result_html, page_pids_state])
+    next_btn.click(lambda res, p, s, f, t, k: goto(res, int(p) + 1, s, f, t, k),
+                   goto_in, [page_dd, gallery, result_html, page_pids_state])
+    gallery.select(on_pick, [page_pids_state], [pick_html])
+    demo.load(None, None, None, js=_PREVIEW_JS)  # lightbox開閉に応じて選択中表示を出し入れ
 
 
 if __name__ == "__main__":
