@@ -15,6 +15,8 @@ armchair / armpit_hair / 色つき hairband など大量のノイズが混じる
 """
 from __future__ import annotations
 
+import unicodedata
+
 # 髪型の形状/長さ/結い方/分け目/質感を表すタグの許可リスト。
 # （Danbooru/WD v3 の実タグ名に合わせている。色・アクセサリ・体毛・動作は含めない）
 HAIR_SHAPE_ALLOWLIST = {
@@ -32,6 +34,7 @@ HAIR_SHAPE_ALLOWLIST = {
     # --- ポニーテール系 ---
     "ponytail", "high_ponytail", "low_ponytail", "side_ponytail",
     "folded_ponytail", "front_ponytail", "short_ponytail", "split_ponytail",
+    "high_side_ponytail", "wide_ponytail",
 
     # --- ツインテール系 ---
     "twintails", "low_twintails", "short_twintails", "uneven_twintails",
@@ -41,7 +44,8 @@ HAIR_SHAPE_ALLOWLIST = {
     "braid", "twin_braids", "single_braid", "french_braid", "crown_braid",
     "side_braid", "side_braids", "low_twin_braids", "braided_ponytail",
     "long_braid", "tri_braids", "multiple_braids", "braided_bangs",
-    "low-braided_long_hair", "low-tied_long_hair",
+    "low-braided_long_hair", "low-tied_long_hair", "braided_hair_rings",
+    "low-tied_sidelocks", "multi-tied_hair",
 
     # --- お団子 / まとめ髪 ---
     "hair_bun", "double_bun", "single_hair_bun", "cone_hair_bun",
@@ -54,6 +58,7 @@ HAIR_SHAPE_ALLOWLIST = {
     # --- 質感 / うねり ---
     "straight_hair", "wavy_hair", "curly_hair", "messy_hair", "spiked_hair",
     "flipped_hair", "hair_flaps", "dreadlocks", "hair_slicked_back",
+    "folded_hair", "hair_wings",
 
     # --- 個別形状パーツ ---
     "ahoge", "huge_ahoge", "heart_ahoge", "antenna_hair", "cowlick",
@@ -62,6 +67,7 @@ HAIR_SHAPE_ALLOWLIST = {
 
     # --- カット / 髪型名 ---
     "bob_cut", "bowl_cut", "hime_cut", "undercut", "mohawk", "buzz_cut",
+    "pompadour", "afro", "bangs_pinned_back",
 }
 
 
@@ -101,6 +107,41 @@ JP_SYNONYMS = {
     "ウェーブ": "wavy_hair", "ウェーブヘア": "wavy_hair", "波": "wavy_hair",
     "ストレート": "straight_hair", "さらさら": "straight_hair",
     "外ハネ": "flipped_hair", "はねる": "flipped_hair",
+    # 結び方の言い換え
+    "おさげ": "twin_braids", "お下げ": "twin_braids",
+    "二つ結び": "twintails", "ふたつ結び": "twintails",
+    "一つ結び": "ponytail", "ひとつ結び": "ponytail",
+    "サイド三つ編み": "side_braid", "横三つ編み": "side_braid",
+    "編みおろし": "single_braid", "編み下ろし": "single_braid",
+    # 長さ・カット
+    "スーパーロング": "absurdly_long_hair", "ベリーショート": "very_short_hair",
+    "ショートカット": "short_hair", "マッシュ": "bowl_cut", "マッシュルームカット": "bowl_cut",
+    "刈り上げ": "undercut", "ツーブロック": "undercut", "アンダーカット": "undercut",
+    "坊主": "buzz_cut", "丸刈り": "buzz_cut", "モヒカン": "mohawk",
+    "ちょんまげ": "topknot", "トップノット": "topknot",
+    # 前髪の種類
+    "オン眉": "short_bangs", "眉上": "short_bangs", "眉上前髪": "short_bangs", "短い前髪": "short_bangs",
+    "長い前髪": "long_bangs", "ロング前髪": "long_bangs",
+    "カーテンバング": "curtained_hair", "アーチ前髪": "arched_bangs",
+    "クロス前髪": "crossed_bangs", "交差前髪": "crossed_bangs",
+    "ギザギザ前髪": "choppy_bangs", "アシメ前髪": "asymmetrical_bangs",
+    "編み込み前髪": "braided_bangs", "切りっぱなし": "blunt_ends",
+    # 質感・スタイル
+    "オールバック": "hair_slicked_back", "かきあげ": "hair_pulled_back",
+    "ボサボサ": "messy_hair", "無造作": "messy_hair", "寝ぐせ": "messy_hair",
+    "ツンツン": "spiked_hair", "スパイキー": "spiked_hair",
+    "ドレッド": "dreadlocks", "ドレッドヘア": "dreadlocks",
+    "盛り髪": "big_hair", "リングレット": "ringlets",
+    "アシメ": "asymmetrical_hair", "アシンメトリー": "asymmetrical_hair",
+    # 語彙拡張分（2026-08）
+    "ポンパドール": "pompadour", "アフロ": "afro",
+    "前髪ポンパ": "bangs_pinned_back", "ポンパ前髪": "bangs_pinned_back", "ポンパ": "bangs_pinned_back",
+    "ハイサイドポニー": "high_side_ponytail", "ハイサイドテール": "high_side_ponytail",
+    # パーツ・複合
+    "インテーク": "hair_intakes", "うなじ": "nape",
+    "ハートアホ毛": "heart_ahoge", "でかアホ毛": "huge_ahoge", "巨大アホ毛": "huge_ahoge",
+    "編み込みお団子": "braided_bun", "ドーナツお団子": "doughnut_hair_bun",
+    "クラウンブレイド": "crown_braid", "冠三つ編み": "crown_braid",
     # 個別
     "姫カット": "hime_cut", "姫": "hime_cut", "ボブ": "bob_cut", "ボブカット": "bob_cut", "ショートボブ": "bob_cut",
     "アホ毛": "ahoge", "あほげ": "ahoge", "触角": "antenna_hair", "アンテナ": "antenna_hair", "触覚": "antenna_hair",
@@ -113,6 +154,63 @@ JP_SYNONYMS = {
 }
 
 
+# --- 表記ゆれ正規化 ---------------------------------------------------------
+# 「ツインみつあみ」「ツインミツアミ」「ツイン三つ編み」を同一視するため、
+# 入力と辞書キーの両方を同じ正規形（NFKC→小文字→カタカナ→形態素置換）に落とす。
+
+_HIRA_TO_KATA = {i: i + 0x60 for i in range(0x3041, 0x3097)}  # ぁ-ゖ → ァ-ヶ
+
+# カタカナ統一後の文字列に適用する形態素の正規化（かな表記→漢字かな交じりの正規形）。
+# 順序に意味がある: 長い/包含関係のあるパターンを先に置換する。
+_MORPH_CANON = [
+    ("ミツアミ", "三ツ編ミ"), ("三ツアミ", "三ツ編ミ"), ("ミツ編ミ", "三ツ編ミ"),
+    ("三ツ網", "三ツ編ミ"), ("3ツ編ミ", "三ツ編ミ"),
+    ("アミコミ", "編ミ込ミ"), ("編ミコミ", "編ミ込ミ"), ("アミ込ミ", "編ミ込ミ"),
+    ("ダンゴ", "団子"),
+    ("ヘアー", "ヘア"),
+    ("オンマユ", "オン眉"), ("マユウエ", "眉上"),
+]
+
+
+def normalize_ja(text: str) -> str:
+    """表記ゆれ吸収の正規形: NFKC → 小文字 → ひらがな→カタカナ → 形態素置換。"""
+    s = unicodedata.normalize("NFKC", text or "").lower().strip()
+    s = s.translate(_HIRA_TO_KATA)
+    for src, dst in _MORPH_CANON:
+        s = s.replace(src, dst)
+    return s
+
+
+# 正規形をキーにした同義語辞書（起動時に一度だけ構築）
+_JP_SYNONYMS_NORM = {normalize_ja(k): v for k, v in JP_SYNONYMS.items()}
+
+# 接頭辞 + 基本形状 → 複合タグ。「ツイン＋(三つ編み=braid)→twin_braids」のように、
+# 辞書に無い複合語を分解して解決する。キーは (正規形の接頭辞, 基本タグ)。
+_PREFIX_COMBOS = {
+    ("ツイン", "braid"): "twin_braids",
+    ("ツイン", "hair_bun"): "double_bun",
+    ("ツイン", "drill_hair"): "twin_drills",
+    ("ツイン", "ponytail"): "twintails",
+    ("ロー", "twintails"): "low_twintails", ("低", "twintails"): "low_twintails",
+    ("ロー", "ponytail"): "low_ponytail", ("低", "ponytail"): "low_ponytail",
+    ("ハイ", "ponytail"): "high_ponytail", ("高", "ponytail"): "high_ponytail",
+    ("ハイ", "side_ponytail"): "high_side_ponytail", ("高", "side_ponytail"): "high_side_ponytail",
+    ("ロー", "twin_braids"): "low_twin_braids", ("低", "twin_braids"): "low_twin_braids",
+    ("サイド", "braid"): "side_braid", ("横", "braid"): "side_braid",
+    ("サイド", "ponytail"): "side_ponytail",
+    ("サイド", "hair_bun"): "single_side_bun",
+    ("サイド", "drill_hair"): "side_drill",
+    ("ショート", "ponytail"): "short_ponytail",
+    ("ショート", "twintails"): "short_twintails",
+    ("ロング", "braid"): "long_braid",
+    ("片", "hair_bun"): "single_hair_bun",
+    ("両", "hair_bun"): "double_bun",
+    ("両", "braid"): "twin_braids",
+    ("一本", "braid"): "single_braid",
+}
+_COMBO_PREFIXES = sorted({p for p, _ in _PREFIX_COMBOS}, key=len, reverse=True)
+
+
 def is_hair_shape_tag(tag: str) -> bool:
     """そのタグが髪の形状/長さ/質感タグ（許可リスト内）なら True。"""
     return tag in HAIR_SHAPE_ALLOWLIST
@@ -121,7 +219,8 @@ def is_hair_shape_tag(tag: str) -> bool:
 def resolve_tag(token: str, vocab) -> str | None:
     """ユーザー入力トークンを WD形状タグに解決する。無理なら None。
 
-    優先順: 完全一致 → 同義語辞書 → 空白をアンダースコアに → 部分一致（あいまい補完）。
+    優先順: 完全一致 → 同義語辞書（表記ゆれ正規化込み）→ 接頭辞合成
+    → 空白をアンダースコアに → 部分一致（あいまい補完）。
     """
     vocab_set = set(vocab)
     t = token.strip()
@@ -131,10 +230,19 @@ def resolve_tag(token: str, vocab) -> str | None:
         return t
     if t in JP_SYNONYMS:
         return JP_SYNONYMS[t]
-    low = t.lower().strip()
-    if low in JP_SYNONYMS:
-        return JP_SYNONYMS[low]
-    us = low.replace(" ", "_").replace("-", "_")
+    norm = normalize_ja(t)
+    if norm in _JP_SYNONYMS_NORM:
+        return _JP_SYNONYMS_NORM[norm]
+    # 接頭辞合成: 「ツイン＋みつあみ」のような辞書に無い複合語を分解して解決
+    for prefix in _COMBO_PREFIXES:
+        if norm.startswith(prefix) and len(norm) > len(prefix):
+            rest = _JP_SYNONYMS_NORM.get(norm[len(prefix):])
+            if rest:
+                combined = _PREFIX_COMBOS.get((prefix, rest))
+                if combined:
+                    return combined
+                return rest  # 合成先が無ければ基本形状だけでも返す
+    us = norm.replace(" ", "_").replace("-", "_")
     if us in vocab_set:
         return us
     # あいまい: 入力がタグの部分文字列（またはその逆）で最短一致
