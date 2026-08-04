@@ -1,0 +1,101 @@
+name: Build & Release exe
+
+# Windows exe のビルド〜GitHub Release 作成を自動化。
+# 使い方:
+#   A) Actions タブから手動実行（version に v0.4.0 等を入力）
+#      dry_run=true にすると Release は作らず、zip を Artifact に置くだけ（動作確認用）
+#   B) `git tag v0.4.0 && git push origin v0.4.0` でも起動
+# モデル(446MB)は HF から取得して actions/cache に保持。
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "リリースするバージョンタグ（例: v0.4.0）"
+        required: true
+      dry_run:
+        description: "true でビルドのみ（Release作成なし・Artifactにzip）"
+        required: false
+        default: "false"
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Cache tagger model
+        uses: actions/cache@v4
+        with:
+          path: model
+          key: wd-swinv2-tagger-v3-flat
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Download tagger model (if not cached)
+        run: |
+          if (-not (Test-Path model/model.onnx)) {
+            python -c "from huggingface_hub import hf_hub_download; import shutil, os; os.makedirs('model', exist_ok=True); [shutil.copy(hf_hub_download('SmilingWolf/wd-swinv2-tagger-v3', f), os.path.join('model', f)) for f in ['model.onnx', 'selected_tags.csv']]"
+          }
+
+      - name: Collect licenses (spec が licenses/ 必須)
+        run: python packaging/collect_licenses.py
+
+      - name: Build exe (PyInstaller)
+        run: pyinstaller packaging/booth-hair-search.spec --distpath dist --workpath build --noconfirm
+
+      # 実際に起動して UI が応答するか確認（モデルロード込みで数分かかる）
+      - name: Smoke test exe
+        run: |
+          $p = Start-Process -FilePath "dist/booth-hair-search/booth-hair-search.exe" -PassThru
+          $ok = $false
+          foreach ($i in 1..60) {
+            Start-Sleep -Seconds 5
+            try {
+              $r = Invoke-WebRequest -Uri "http://127.0.0.1:7860/" -UseBasicParsing -TimeoutSec 5
+              if ($r.StatusCode -eq 200) { $ok = $true; break }
+            } catch {}
+          }
+          Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+          if (-not $ok) { throw "exe が 5 分以内に起動しませんでした" }
+
+      - name: Zip（スモークテストの実行時データは除外）
+        run: |
+          Remove-Item -Recurse -Force dist/booth-hair-search/booth-hair-search-data -ErrorAction SilentlyContinue
+          tar.exe -a -c -f booth-hair-search-win-x64.zip -C dist booth-hair-search
+          python -c "import zipfile; z=zipfile.ZipFile('booth-hair-search-win-x64.zip'); n=z.namelist(); assert n, 'empty zip'; assert not any('booth-hair-search-data' in x for x in n), 'runtime data leaked'; print('zip OK:', len(n), 'entries')"
+
+      - name: Upload artifact (dry run のみ)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: booth-hair-search-win-x64
+          path: booth-hair-search-win-x64.zip
+          retention-days: 3
+
+      - name: Create GitHub Release
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = if ("${{ github.event_name }}" -eq "push") { "${{ github.ref_name }}" } else { "${{ inputs.version }}" }
+          gh release create $tag --target $env:GITHUB_SHA --title "booth-hair-search $tag (Windows)" --notes-file packaging/release-body.md --latest booth-hair-search-win-x64.zip
