@@ -156,8 +156,8 @@ def _render_page(results, page, sort="類似度順"):
         had_cache = (THUMB_CACHE / f"{pid}.jpg").exists()
         img = _thumb_path(pid, r.get("thumbnail_url"), allow_fetch=fetch_fails < 2)
         if img:
-            # キャプションに商品名を入れて「どのサムネがどれか」を分かりやすく
-            gallery.append((img, f"#{rank} {r['name'][:16]}"))
+            # キャプションは商品名フル（小タイルは見切れる／拡大表示で全部見える）
+            gallery.append((img, f"#{rank} {r['name']}"))
             page_pids.append(pid)  # ギャラリー表示順のIDを記録（クリック→商品特定に使う）
         elif (not had_cache and fetch_fails < 2
               and (r.get("thumbnail_url") or "").startswith("https://")):
@@ -279,6 +279,24 @@ def on_pick(page_pids, evt: gr.SelectData):
     )
 
 
+# サムネ拡大(lightbox)が開いている間だけ #pickbox を表示するJS。
+# Gradioに拡大の開閉イベントが無いため、ギャラリー内に拡大ビュー(.preview)が
+# 出現/消滅するのをMutationObserverで監視して display を切り替える。
+_PREVIEW_JS = """
+() => {
+  const box = document.getElementById('pickbox');
+  const gal = document.getElementById('cand_gallery');
+  if (!box || !gal) return;
+  const sync = () => {
+    const open = !!gal.querySelector('.preview');
+    box.style.display = open ? '' : 'none';
+  };
+  new MutationObserver(sync).observe(gal, {childList: true, subtree: true, attributes: true});
+  sync();
+}
+"""
+
+
 with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     gr.Markdown(
         "# 画像から探す髪型検索ツール\n"
@@ -320,11 +338,14 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
                 prev_btn = gr.Button("◀ 前の10件", scale=1)
                 page_dd = gr.Dropdown(choices=[1], value=1, label="ページ (10件ずつ)", scale=2)
                 next_btn = gr.Button("次の10件 ▶", scale=1)
-            pick_html = gr.HTML()  # サムネクリックで選んだ商品のリンクをここに表示
+            # サムネ拡大中だけ表示（下部のload JSがlightbox開閉を監視して出し入れ）
+            pick_html = gr.HTML(elem_id="pickbox")
             # height固定だとギャラリー内スクロールが発生して1段目が切れる → 自動高さで
             # 2行(10件)を丸ごと表示する。キャプションに商品名を出す
             gallery = gr.Gallery(label="候補（サムネクリックでリンク表示）", columns=5, rows=2,
-                                 height="auto", object_fit="cover")
+                                 height="auto", object_fit="cover",
+                                 buttons=["download", "fullscreen"],  # share は消す
+                                 elem_id="cand_gallery")
             result_html = gr.HTML()
 
     redisplay_in = [results_state, tag_only, tags, sort, keyword]
@@ -345,6 +366,7 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     next_btn.click(lambda res, p, s, f, t, k: goto(res, int(p) + 1, s, f, t, k),
                    goto_in, [page_dd, gallery, result_html, page_pids_state])
     gallery.select(on_pick, [page_pids_state], [pick_html])
+    demo.load(None, None, None, js=_PREVIEW_JS)  # lightbox開閉に応じて選択中表示を出し入れ
 
 
 if __name__ == "__main__":
