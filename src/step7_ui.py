@@ -76,11 +76,21 @@ MATCHER = HairMatcher()
 print(f"  準備完了: {len(MATCHER.pids)} 商品 / 語彙 {len(MATCHER.vocab)} タグ", file=sys.stderr)
 
 
-def on_extract(image_path):
+def _editor_path(image):
+    """ImageEditor の値（dict）から実際の画像パスを取り出す。切り抜き後は composite。"""
+    if isinstance(image, dict):
+        return image.get("composite") or image.get("background")
+    return image  # 後方互換（文字列パス）
+
+
+def on_extract(image):
     """画像から髪タグを抽出。強いタグをドロップダウンに、弱いタグも含む全確信度をStateに。
 
     全generalタグの確信度も別Stateに保存し、検索時のハイブリッド（髪タグ＋全タグ）に使う。
+    画像は ImageEditor 経由（ユーザーが✂で頭部を切り抜いてから抽出できる。
+    実写や引きのスクショはクロップすると精度が大きく上がる）。
     """
+    image_path = _editor_path(image)
     if not image_path:
         return gr.update(value=[]), {}, {}, "画像をアップロードしてください。"
     # 照合には弱いシグナル(>=0.05)も使う（母数が多いDBで効く）。表示・編集は強いタグ(>=0.2)。
@@ -336,9 +346,16 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     page_pids_state = gr.State([])  # 現在ギャラリーに出ている商品IDの並び（クリック特定用）
     with gr.Row():
         with gr.Column(scale=1):
-            image = gr.Image(
-                type="filepath", label="画像をアップロード", height=320,
-                sources=["upload", "clipboard"],  # ウェブカメラは無効
+            # ImageEditor: 貼り付け後に✂（クロップ）で頭部を切り抜ける。
+            # 実写や引きのスクショは、髪が大きく写るよう切り抜くと精度が上がる
+            image = gr.ImageEditor(
+                type="filepath", label="画像をアップロード（✂で切り抜き→自動で再抽出）",
+                height=380, sources=["upload", "clipboard"],  # ウェブカメラは無効
+                transforms=("crop",), brush=False, eraser=False, layers=False,
+                # 既定の image_mode="RGBA" だと JPG入力→RGBA変換→JPEG保存で
+                # "cannot write mode RGBA as JPEG" になる（Gradio 6.22）。
+                # タガーは透過を白合成するので RGB で十分
+                image_mode="RGB", format="png",
             )
             extract_btn = gr.Button("① タグ抽出", variant="secondary")
             info = gr.Markdown()
@@ -382,6 +399,8 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
 
     extract_btn.click(on_extract, [image], [tags, detected_state, all_tags_state, info])
     image.upload(on_extract, [image], [tags, detected_state, all_tags_state, info])
+    # ✂で切り抜きを確定(apply)したら自動で再抽出（クロップ→即タグ更新）
+    image.apply(on_extract, [image], [tags, detected_state, all_tags_state, info])
     tags.change(on_tags_change, [tags], [tags, tag_note])
     search_btn.click(on_search, [tags, detected_state, all_tags_state, tag_only, sort, keyword],
                      [results_state, page_dd, gallery, result_html, page_pids_state])
