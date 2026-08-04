@@ -1,0 +1,30 @@
+name: Tests
+
+# 同義語辞書・タグ解決の回帰テスト。モデル・ネットワーク不要で数秒で終わる。
+# jp_synonyms.json の解決先タグが語彙に実在するかも検証（push配信のtypo事故防止）。
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "data/jp_synonyms.json"
+      - "data/hair_vocab.json"
+      - "tests/**"
+  pull_request:
+    paths:
+      - "src/**"
+      - "data/jp_synonyms.json"
+      - "data/hair_vocab.json"
+      - "tests/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests
+        run: python tests/test_hair_tags.py
