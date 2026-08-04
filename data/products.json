@@ -21428,5 +21428,35 @@
     "shop_url": "https://akamo-kamo.booth.pm/",
     "price": 500,
     "has_vrchat_badge": true
+  },
+  {
+    "product_id": "8683756",
+    "name": "【Lapwing/Grus】Classic Twin Braids【3D hairstyle】",
+    "url": "https://booth.pm/ja/items/8683756",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/40133c44-60da-4e92-8ffb-49c08a4ea35e/i/8683756/8241c47a-c368-479c-92c9-1692c090b735_base_resized.jpg",
+    "shop_name": "lunvelle",
+    "shop_url": "https://lunvelle.booth.pm/",
+    "price": 900,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "8681940",
+    "name": "✦SALE✦ - Kemomimi Wave - TwinTail & Kemomimi🐾【16Avatars】",
+    "url": "https://booth.pm/ja/items/8681940",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/9b740842-7c2d-4313-afcc-dea2da627161/i/8681940/edc2f9a9-fbe6-44ed-8cf8-0b1858e0db12_base_resized.jpg",
+    "shop_name": "#Korecia",
+    "shop_url": "https://korecia.booth.pm/",
+    "price": 790,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "8680708",
+    "name": "【vroid】ロングヘア/ long hair preset",
+    "url": "https://booth.pm/ja/items/8680708",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/9970dbe2-2511-438c-968f-b22cf2324a03/i/8680708/bf27cf26-c52f-4cf8-b8b2-f01ff46094c7_base_resized.jpg",
+    "shop_name": "maibonbe屋",
+    "shop_url": "https://maibonbemaibonbe.booth.pm/",
+    "price": 250,
+    "has_vrchat_badge": false
   }
 ]

@@ -18527,5 +18527,28 @@
   "8649445": {
     "hair_between_eyes": 0.3411,
     "short_hair": 0.8083
+  },
+  "8683756": {
+    "blunt_bangs": 0.1748,
+    "braid": 0.9098,
+    "long_hair": 0.6305,
+    "low_twin_braids": 0.1131,
+    "twin_braids": 0.9172,
+    "twintails": 0.1638
+  },
+  "8681940": {
+    "ahoge": 0.8375,
+    "hair_between_eyes": 0.1355,
+    "heart_ahoge": 0.5912,
+    "long_hair": 0.8722,
+    "sidelocks": 0.2767,
+    "twintails": 0.9083,
+    "very_long_hair": 0.1032
+  },
+  "8680708": {
+    "hair_between_eyes": 0.6433,
+    "long_hair": 0.9472,
+    "sidelocks": 0.1066,
+    "very_long_hair": 0.196
   }
 }
