@@ -65,7 +65,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/products.json data/hair_vectors.json data/hair_vocab.json data/product_stats.json
+          git add data/products.json data/hair_vectors.json data/hair_vocab.json data/product_stats.json data/full_vectors.json
           if git diff --cached --quiet; then
             echo "変更なし。コミットしません。"
           else
