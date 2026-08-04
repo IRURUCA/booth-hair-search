@@ -34,6 +34,7 @@ HAIR_SHAPE_ALLOWLIST = {
     # --- ポニーテール系 ---
     "ponytail", "high_ponytail", "low_ponytail", "side_ponytail",
     "folded_ponytail", "front_ponytail", "short_ponytail", "split_ponytail",
+    "high_side_ponytail", "wide_ponytail",
 
     # --- ツインテール系 ---
     "twintails", "low_twintails", "short_twintails", "uneven_twintails",
@@ -43,7 +44,8 @@ HAIR_SHAPE_ALLOWLIST = {
     "braid", "twin_braids", "single_braid", "french_braid", "crown_braid",
     "side_braid", "side_braids", "low_twin_braids", "braided_ponytail",
     "long_braid", "tri_braids", "multiple_braids", "braided_bangs",
-    "low-braided_long_hair", "low-tied_long_hair",
+    "low-braided_long_hair", "low-tied_long_hair", "braided_hair_rings",
+    "low-tied_sidelocks", "multi-tied_hair",
 
     # --- お団子 / まとめ髪 ---
     "hair_bun", "double_bun", "single_hair_bun", "cone_hair_bun",
@@ -56,6 +58,7 @@ HAIR_SHAPE_ALLOWLIST = {
     # --- 質感 / うねり ---
     "straight_hair", "wavy_hair", "curly_hair", "messy_hair", "spiked_hair",
     "flipped_hair", "hair_flaps", "dreadlocks", "hair_slicked_back",
+    "folded_hair", "hair_wings",
 
     # --- 個別形状パーツ ---
     "ahoge", "huge_ahoge", "heart_ahoge", "antenna_hair", "cowlick",
@@ -64,6 +67,7 @@ HAIR_SHAPE_ALLOWLIST = {
 
     # --- カット / 髪型名 ---
     "bob_cut", "bowl_cut", "hime_cut", "undercut", "mohawk", "buzz_cut",
+    "pompadour", "afro", "bangs_pinned_back",
 }
 
 
@@ -129,6 +133,10 @@ JP_SYNONYMS = {
     "ドレッド": "dreadlocks", "ドレッドヘア": "dreadlocks",
     "盛り髪": "big_hair", "リングレット": "ringlets",
     "アシメ": "asymmetrical_hair", "アシンメトリー": "asymmetrical_hair",
+    # 語彙拡張分（2026-08）
+    "ポンパドール": "pompadour", "アフロ": "afro",
+    "前髪ポンパ": "bangs_pinned_back", "ポンパ前髪": "bangs_pinned_back", "ポンパ": "bangs_pinned_back",
+    "ハイサイドポニー": "high_side_ponytail", "ハイサイドテール": "high_side_ponytail",
     # パーツ・複合
     "インテーク": "hair_intakes", "うなじ": "nape",
     "ハートアホ毛": "heart_ahoge", "でかアホ毛": "huge_ahoge", "巨大アホ毛": "huge_ahoge",
@@ -186,6 +194,7 @@ _PREFIX_COMBOS = {
     ("ロー", "twintails"): "low_twintails", ("低", "twintails"): "low_twintails",
     ("ロー", "ponytail"): "low_ponytail", ("低", "ponytail"): "low_ponytail",
     ("ハイ", "ponytail"): "high_ponytail", ("高", "ponytail"): "high_ponytail",
+    ("ハイ", "side_ponytail"): "high_side_ponytail", ("高", "side_ponytail"): "high_side_ponytail",
     ("ロー", "twin_braids"): "low_twin_braids", ("低", "twin_braids"): "low_twin_braids",
     ("サイド", "braid"): "side_braid", ("横", "braid"): "side_braid",
     ("サイド", "ponytail"): "side_ponytail",
