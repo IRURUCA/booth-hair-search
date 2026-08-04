@@ -30,6 +30,7 @@ from wd_tagger import WDTagger
 ROOT = Path(__file__).resolve().parent.parent
 PRODUCTS_FILE = ROOT / "data" / "products.json"
 HAIR_VECTORS_FILE = ROOT / "data" / "hair_vectors.json"
+FULL_VECTORS_FILE = ROOT / "data" / "full_vectors.json"  # 全generalタグ（ハイブリッド検索用）
 STATS_FILE = ROOT / "data" / "product_stats.json"
 IMAGES_DIR = ROOT / "images"
 MODEL_CACHE = ROOT / "cache" / "hf"
@@ -83,6 +84,8 @@ def main() -> None:
             break
 
     hair_vectors = json.loads(HAIR_VECTORS_FILE.read_text(encoding="utf-8"))
+    full_vectors = (json.loads(FULL_VECTORS_FILE.read_text(encoding="utf-8"))
+                    if FULL_VECTORS_FILE.exists() else {})
     stats = json.loads(STATS_FILE.read_text(encoding="utf-8")) if STATS_FILE.exists() else {}
 
     # --- 新商品のタグ付け＋stats ---
@@ -98,6 +101,8 @@ def main() -> None:
                     client.get_image(p["thumbnail_url"], dest)
                     g = tagger.tag_image(dest)
                     hair_vectors[pid] = {t: round(g.get(t, 0.0), 4) for t in vocab if g.get(t, 0.0) >= HAIR_EPS}
+                    # ハイブリッド検索用: 全generalタグの sparse ベクトルも保存
+                    full_vectors[pid] = {t: round(c, 4) for t, c in g.items() if c >= HAIR_EPS}
                 stats[pid] = _fetch_stats(client, pid)
                 ok += 1
             except CrawlStop:
@@ -122,6 +127,7 @@ def main() -> None:
                 pruned.append(pid)
                 by_id.pop(pid, None)
                 hair_vectors.pop(pid, None)
+                full_vectors.pop(pid, None)
                 stats.pop(pid, None)
                 print(f"  {pid} は404（削除済み）→ 剪定", file=sys.stderr)
             else:
@@ -134,6 +140,7 @@ def main() -> None:
     products = list(by_id.values())
     PRODUCTS_FILE.write_text(json.dumps(products, ensure_ascii=False, indent=2), encoding="utf-8")
     HAIR_VECTORS_FILE.write_text(json.dumps(hair_vectors, ensure_ascii=False, indent=2), encoding="utf-8")
+    FULL_VECTORS_FILE.write_text(json.dumps(full_vectors, ensure_ascii=False), encoding="utf-8")
     STATS_FILE.write_text(json.dumps(stats, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"更新完了: 新商品 {len(new_products)} 件（タグ済み {ok}）"

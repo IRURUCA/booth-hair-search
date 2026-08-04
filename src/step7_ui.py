@@ -77,17 +77,20 @@ print(f"  準備完了: {len(MATCHER.pids)} 商品 / 語彙 {len(MATCHER.vocab)}
 
 
 def on_extract(image_path):
-    """画像から髪タグを抽出。強いタグをドロップダウンに、弱いタグも含む全確信度をStateに。"""
+    """画像から髪タグを抽出。強いタグをドロップダウンに、弱いタグも含む全確信度をStateに。
+
+    全generalタグの確信度も別Stateに保存し、検索時のハイブリッド（髪タグ＋全タグ）に使う。
+    """
     if not image_path:
-        return gr.update(value=[]), {}, "画像をアップロードしてください。"
+        return gr.update(value=[]), {}, {}, "画像をアップロードしてください。"
     # 照合には弱いシグナル(>=0.05)も使う（母数が多いDBで効く）。表示・編集は強いタグ(>=0.2)。
-    full = MATCHER.extract_hair_tags(image_path, thresh=0.05)
+    full, all_tags = MATCHER.extract_for_search(image_path, thresh=0.05)
     strong = {t: c for t, c in full.items() if c >= 0.2}
     if not full:
-        return gr.update(value=[]), {}, "髪タグを検出できませんでした。手で追加してください。"
+        return gr.update(value=[]), {}, all_tags, "髪タグを検出できませんでした。手で追加してください。"
     md = "**自動抽出タグ**（確信度）: " + (", ".join(f"`{t}` {c:.2f}" for t, c in strong.items()) or "（強いタグなし）")
     md += "\n\n→ 弱い候補タグも内部で照合に使っています。下のタグは**手で修正・追加**できます（例: 三つ編みなら `braid`）。"
-    return gr.update(value=list(strong.keys())), full, md
+    return gr.update(value=list(strong.keys())), full, all_tags, md
 
 
 PER_PAGE = 10
@@ -225,7 +228,7 @@ def _filtered(results, tag_only, selected_tags, keyword=""):
     return out
 
 
-def on_search(selected_tags, detected, tag_only, sort, keyword):
+def on_search(selected_tags, detected, all_tags_state, tag_only, sort, keyword):
     """検索してランキング全体を State に入れ、1ページ目を描画。ページ選択肢も更新。"""
     if not selected_tags:
         return [], gr.update(choices=[1], value=1), [], "タグを1つ以上選んでください。", []
@@ -240,8 +243,10 @@ def on_search(selected_tags, detected, tag_only, sort, keyword):
     for t in selected_tags:
         if t not in detected:
             query[t] = 1.0  # ユーザーが手で足した
-    # DBにある限り全件をランキング（ページで手繰れるように）。絞り込みは表示時に適用
-    pool = MATCHER.search(query, top_k=len(MATCHER.pids))
+    # DBにある限り全件をランキング（ページで手繰れるように）。絞り込みは表示時に適用。
+    # 画像がある場合は全タグ側もクエリに渡してハイブリッド（タグのみ検索は従来どおり）
+    pool = MATCHER.search(query, top_k=len(MATCHER.pids),
+                          full_query=all_tags_state or None)
     view = _filtered(pool, tag_only, selected_tags, keyword)
     npages = _num_pages(len(view))
     gallery, table_html, pids = _render_page(view, 1, sort)
@@ -326,6 +331,7 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
         "**タグは手で直せます**——自動抽出が取りこぼした特徴（三つ編み等）を足すと精度が上がります。"
     )
     detected_state = gr.State({})
+    all_tags_state = gr.State({})  # 画像の全generalタグ確信度（ハイブリッド検索の全タグ側クエリ）
     results_state = gr.State([])
     page_pids_state = gr.State([])  # 現在ギャラリーに出ている商品IDの並び（クリック特定用）
     with gr.Row():
@@ -374,10 +380,10 @@ with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     redisplay_out = [page_dd, gallery, result_html, page_pids_state]
     goto_in = [results_state, page_dd, sort, tag_only, tags, keyword]
 
-    extract_btn.click(on_extract, [image], [tags, detected_state, info])
-    image.upload(on_extract, [image], [tags, detected_state, info])
+    extract_btn.click(on_extract, [image], [tags, detected_state, all_tags_state, info])
+    image.upload(on_extract, [image], [tags, detected_state, all_tags_state, info])
     tags.change(on_tags_change, [tags], [tags, tag_note])
-    search_btn.click(on_search, [tags, detected_state, tag_only, sort, keyword],
+    search_btn.click(on_search, [tags, detected_state, all_tags_state, tag_only, sort, keyword],
                      [results_state, page_dd, gallery, result_html, page_pids_state])
     sort.change(on_redisplay, redisplay_in, redisplay_out)
     tag_only.change(on_redisplay, redisplay_in, redisplay_out)

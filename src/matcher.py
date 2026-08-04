@@ -88,6 +88,24 @@ class HairMatcher:
         Pw = P * self.weights
         self.Pn = Pw / (np.linalg.norm(Pw, axis=1, keepdims=True) + 1e-9)
 
+        # ハイブリッド検索用: 全generalタグ(約8千)の sparse ベクトル（step15で有効性検証済み。
+        # 23枚eval top-10 26%→52%）。無ければ従来の髪タグのみで動く（後方互換）。
+        self.full_index: dict[str, int] = {}
+        self.Fn = None
+        fv_file = data_file("full_vectors.json")
+        if fv_file.exists():
+            try:
+                fv = json.loads(fv_file.read_text(encoding="utf-8"))
+                all_tags = sorted({t for v in fv.values() for t in v})
+                self.full_index = {t: i for i, t in enumerate(all_tags)}
+                F = np.zeros((len(self.pids), len(all_tags)), dtype=np.float32)
+                for r, pid in enumerate(self.pids):
+                    for t, c in (fv.get(pid) or {}).items():
+                        F[r, self.full_index[t]] = c
+                self.Fn = F / (np.linalg.norm(F, axis=1, keepdims=True) + 1e-9)
+            except Exception:  # noqa: BLE001
+                self.Fn = None  # 壊れたファイル等 → 髪タグのみで続行
+
         # 対応アバター情報（あれば）
         self.product_avatars: dict[str, set[str]] = {}
         if PRODUCT_AVATARS_FILE.exists():
@@ -182,11 +200,46 @@ class HairMatcher:
         pairs = [(t, round(g.get(t, 0.0), 3)) for t in self.vocab if g.get(t, 0.0) >= thresh]
         return dict(sorted(pairs, key=lambda x: -x[1]))
 
-    def search(self, query_tags: dict[str, float], top_k: int = 10) -> list[dict]:
-        """タグ確信度の辞書 -> top_k の商品（スコアつき）。"""
+    def extract_for_search(self, image_path: str, thresh: float = 0.05):
+        """1回のタグ付けで (髪形状タグ, 全generalタグ) の確信度辞書を返す。
+
+        髪タグは編集UI・照合クエリ用、全タグはハイブリッド検索の全タグ側クエリ用。
+        """
+        g = self.tagger.tag_image(Path(image_path))
+        hair = {t: round(g.get(t, 0.0), 3) for t in self.vocab if g.get(t, 0.0) >= thresh}
+        hair = dict(sorted(hair.items(), key=lambda x: -x[1]))
+        full = {t: round(c, 4) for t, c in g.items() if c >= thresh}
+        return hair, full
+
+    # ハイブリッドの重み: 髪タグ+IDF側。step15 の重み掃引で 0.3〜0.7 全てで
+    # 従来を上回り、0.6 近辺が top-5/top-10 最良（23枚eval: top-10 26%→52%）。
+    HYBRID_ALPHA = 0.6
+
+    def search(self, query_tags: dict[str, float], top_k: int = 10,
+               full_query: dict[str, float] | None = None) -> list[dict]:
+        """タグ確信度の辞書 -> top_k の商品（スコアつき）。
+
+        full_query（画像の全generalタグ確信度）があり全タグ行列がロード済みなら、
+        髪タグ+IDF cosine と全タグ cosine の minmax 正規化ブレンドで並べる。
+        タグのみの検索（画像なし）は従来どおり髪タグのみ。
+        """
         q = self._vec(query_tags) * self.weights
         qn = q / (np.linalg.norm(q) or 1.0)
         sims = self.Pn @ qn
+        if full_query and self.Fn is not None:
+            qf = np.zeros(len(self.full_index), dtype=np.float32)
+            for t, c in full_query.items():
+                i = self.full_index.get(t)
+                if i is not None:
+                    qf[i] = c
+            nf = float(np.linalg.norm(qf))
+            if nf > 0:
+                s_full = self.Fn @ (qf / nf)
+
+                def _mm(x):
+                    lo, hi = float(x.min()), float(x.max())
+                    return (x - lo) / (hi - lo + 1e-9)
+                sims = self.HYBRID_ALPHA * _mm(sims) + (1 - self.HYBRID_ALPHA) * _mm(s_full)
         order = np.argsort(-sims)[:top_k]
         out = []
         for i in order:

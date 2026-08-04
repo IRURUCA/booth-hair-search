@@ -28,7 +28,7 @@ from paths import USER_DATA as DATA_DIR  # 書き込み可能な場所（凍結�
 REPO = "IRURUCA/booth-hair-search"
 BRANCH = "main"
 FILES = ["products.json", "hair_vectors.json", "hair_vocab.json", "product_stats.json",
-         "jp_synonyms.json"]
+         "jp_synonyms.json", "full_vectors.json"]
 BASE = f"https://raw.githubusercontent.com/{REPO}/{BRANCH}/data/"
 
 
