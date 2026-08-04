@@ -268,41 +268,15 @@ def on_redisplay(results, tag_only, selected_tags, sort, keyword):
 def on_pick(page_pids, evt: gr.SelectData):
     """サムネクリック→その商品のBOOTHリンクを上部に表示（どのサムネがどれか明確に）。"""
     if not page_pids or evt.index is None or evt.index >= len(page_pids):
-        return "", ""
-    pid = page_pids[evt.index]
-    p = MATCHER.product_by_id.get(pid, {})
-    url = _safe_url({"url": p.get("url"), "product_id": pid})
+        return ""
+    p = MATCHER.product_by_id.get(page_pids[evt.index], {})
+    url = _safe_url({"url": p.get("url"), "product_id": page_pids[evt.index]})
     name = html.escape(p.get("name", ""))
     return (
         "<div style='padding:8px 10px;border:1px solid #4a90d9;border-radius:6px;margin:2px 0'>"
         f"🖼 選択中: <b>{name}</b>　"
         f"<a href='{html.escape(url)}' target='_blank'>🛒 BOOTHで開く ↗</a></div>"
-    ), pid
-
-
-def on_similar(picked_pid, tag_only, sort, keyword):
-    """選択中の商品自身のタグベクトルをクエリに再検索（「この商品に似たものを探す」）。
-
-    商品の強タグをドロップダウンへ、全タグ確信度を detected_state へコピーするので、
-    そのまま手で修正して②検索し直すこともできる。
-    """
-    v = MATCHER.hair_vectors.get(picked_pid or "")
-    if not v:
-        return (gr.update(), gr.update(), gr.update(), gr.update(),
-                gr.update(), gr.update(), gr.update(),
-                "先にサムネイルをクリックして商品を選んでください。")
-    p = MATCHER.product_by_id.get(picked_pid, {})
-    strong = [t for t, c in sorted(v.items(), key=lambda x: -x[1]) if c >= 0.2]
-    pool = MATCHER.search({t: float(c) for t, c in v.items()}, top_k=len(MATCHER.pids))
-    pool = [r for r in pool if r["product_id"] != picked_pid]  # 起点の商品自身は除く
-    view = _filtered(pool, tag_only, strong, keyword)
-    npages = _num_pages(len(view))
-    gallery_items, table_html, pids = _render_page(view, 1, sort)
-    note = (f"🔍 **「{p.get('name', '')}」に似た商品**を表示中。"
-            "タグ欄に起点商品のタグをコピーしました（修正して②検索も可）。")
-    return (gr.update(value=strong), dict(v), pool,
-            gr.update(choices=list(range(1, npages + 1)), value=1),
-            gallery_items, table_html, pids, note)
+    )
 
 
 # サムネ拡大(lightbox)が開いている間だけ #pickbox を表示するJS。
@@ -315,8 +289,7 @@ _PREVIEW_JS = """
   if (!box || !gal) return;
   const sync = () => {
     const preview = gal.querySelector('.preview');
-    // #pickbox は Row(flex)。初期CSSで display:none にしてあるため 'flex' を明示する
-    box.style.display = preview ? 'flex' : 'none';
+    box.style.display = preview ? '' : 'none';
     if (!preview) return;
     // 拡大表示の下に出る「#N 商品名」キャプションもハイパーリンク化する
     const a = box.querySelector('a');
@@ -346,8 +319,7 @@ _PREVIEW_JS = """
 """
 
 
-with gr.Blocks(title="画像から探す髪型検索ツール",
-               css="#pickbox{display:none}") as demo:  # 拡大表示中のみJSがflexで出す
+with gr.Blocks(title="画像から探す髪型検索ツール") as demo:
     gr.Markdown(
         "# 画像から探す髪型検索ツール\n"
         "アバターのスクショや髪型画像から、BOOTHの似た髪型商品を探します。\n"
@@ -356,7 +328,6 @@ with gr.Blocks(title="画像から探す髪型検索ツール",
     detected_state = gr.State({})
     results_state = gr.State([])
     page_pids_state = gr.State([])  # 現在ギャラリーに出ている商品IDの並び（クリック特定用）
-    picked_state = gr.State("")  # 最後にクリックした商品ID（類似検索の起点）
     with gr.Row():
         with gr.Column(scale=1):
             image = gr.Image(
@@ -390,10 +361,7 @@ with gr.Blocks(title="画像から探す髪型検索ツール",
                 page_dd = gr.Dropdown(choices=[1], value=1, label="ページ (10件ずつ)", scale=2)
                 next_btn = gr.Button("次の10件 ▶", scale=1)
             # サムネ拡大中だけ表示（下部のload JSがlightbox開閉を監視して出し入れ）
-            with gr.Row(elem_id="pickbox"):
-                pick_html = gr.HTML()
-                similar_btn = gr.Button("🔍 この商品に似たものを探す", scale=0,
-                                        variant="secondary")
+            pick_html = gr.HTML(elem_id="pickbox")
             # height固定だとギャラリー内スクロールが発生して1段目が切れる → 自動高さで
             # 2行(10件)を丸ごと表示する。キャプションに商品名を出す
             gallery = gr.Gallery(label="候補（サムネクリックでリンク表示）", columns=5, rows=2,
@@ -419,10 +387,7 @@ with gr.Blocks(title="画像から探す髪型検索ツール",
                    goto_in, [page_dd, gallery, result_html, page_pids_state])
     next_btn.click(lambda res, p, s, f, t, k: goto(res, int(p) + 1, s, f, t, k),
                    goto_in, [page_dd, gallery, result_html, page_pids_state])
-    gallery.select(on_pick, [page_pids_state], [pick_html, picked_state])
-    similar_btn.click(on_similar, [picked_state, tag_only, sort, keyword],
-                      [tags, detected_state, results_state, page_dd,
-                       gallery, result_html, page_pids_state, info])
+    gallery.select(on_pick, [page_pids_state], [pick_html])
     demo.load(None, None, None, js=_PREVIEW_JS)  # lightbox開閉に応じて選択中表示を出し入れ
 
 
