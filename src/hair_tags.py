@@ -109,6 +109,31 @@ JP_SYNONYMS = {
     "一つ結び": "ponytail", "ひとつ結び": "ponytail",
     "サイド三つ編み": "side_braid", "横三つ編み": "side_braid",
     "編みおろし": "single_braid", "編み下ろし": "single_braid",
+    # 長さ・カット
+    "スーパーロング": "absurdly_long_hair", "ベリーショート": "very_short_hair",
+    "ショートカット": "short_hair", "マッシュ": "bowl_cut", "マッシュルームカット": "bowl_cut",
+    "刈り上げ": "undercut", "ツーブロック": "undercut", "アンダーカット": "undercut",
+    "坊主": "buzz_cut", "丸刈り": "buzz_cut", "モヒカン": "mohawk",
+    "ちょんまげ": "topknot", "トップノット": "topknot",
+    # 前髪の種類
+    "オン眉": "short_bangs", "眉上": "short_bangs", "眉上前髪": "short_bangs", "短い前髪": "short_bangs",
+    "長い前髪": "long_bangs", "ロング前髪": "long_bangs",
+    "カーテンバング": "curtained_hair", "アーチ前髪": "arched_bangs",
+    "クロス前髪": "crossed_bangs", "交差前髪": "crossed_bangs",
+    "ギザギザ前髪": "choppy_bangs", "アシメ前髪": "asymmetrical_bangs",
+    "編み込み前髪": "braided_bangs", "切りっぱなし": "blunt_ends",
+    # 質感・スタイル
+    "オールバック": "hair_slicked_back", "かきあげ": "hair_pulled_back",
+    "ボサボサ": "messy_hair", "無造作": "messy_hair", "寝ぐせ": "messy_hair",
+    "ツンツン": "spiked_hair", "スパイキー": "spiked_hair",
+    "ドレッド": "dreadlocks", "ドレッドヘア": "dreadlocks",
+    "盛り髪": "big_hair", "リングレット": "ringlets",
+    "アシメ": "asymmetrical_hair", "アシンメトリー": "asymmetrical_hair",
+    # パーツ・複合
+    "インテーク": "hair_intakes", "うなじ": "nape",
+    "ハートアホ毛": "heart_ahoge", "でかアホ毛": "huge_ahoge", "巨大アホ毛": "huge_ahoge",
+    "編み込みお団子": "braided_bun", "ドーナツお団子": "doughnut_hair_bun",
+    "クラウンブレイド": "crown_braid", "冠三つ編み": "crown_braid",
     # 個別
     "姫カット": "hime_cut", "姫": "hime_cut", "ボブ": "bob_cut", "ボブカット": "bob_cut", "ショートボブ": "bob_cut",
     "アホ毛": "ahoge", "あほげ": "ahoge", "触角": "antenna_hair", "アンテナ": "antenna_hair", "触覚": "antenna_hair",
@@ -135,6 +160,7 @@ _MORPH_CANON = [
     ("アミコミ", "編ミ込ミ"), ("編ミコミ", "編ミ込ミ"), ("アミ込ミ", "編ミ込ミ"),
     ("ダンゴ", "団子"),
     ("ヘアー", "ヘア"),
+    ("オンマユ", "オン眉"), ("マユウエ", "眉上"),
 ]
 
 
@@ -164,6 +190,10 @@ _PREFIX_COMBOS = {
     ("サイド", "braid"): "side_braid", ("横", "braid"): "side_braid",
     ("サイド", "ponytail"): "side_ponytail",
     ("サイド", "hair_bun"): "single_side_bun",
+    ("サイド", "drill_hair"): "side_drill",
+    ("ショート", "ponytail"): "short_ponytail",
+    ("ショート", "twintails"): "short_twintails",
+    ("ロング", "braid"): "long_braid",
     ("片", "hair_bun"): "single_hair_bun",
     ("両", "hair_bun"): "double_bun",
     ("両", "braid"): "twin_braids",
