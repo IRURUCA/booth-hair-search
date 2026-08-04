@@ -14,7 +14,8 @@ from pathlib import Path
 
 import numpy as np
 
-from hair_tags import build_hair_vocab, normalize_ja, resolve_tag
+from hair_tags import (build_hair_vocab, load_external_dict, normalize_ja,
+                       resolve_tag)
 from paths import (BUNDLE_MODEL_DIR, BUNDLE_ROOT, HF_CACHE, data_file,
                    has_bundled_model)
 from wd_tagger import WDTagger
@@ -46,8 +47,20 @@ class HairMatcher:
             self.tagger = WDTagger(model_dir=BUNDLE_MODEL_DIR)
         else:
             self.tagger = WDTagger(cache_dir=HF_CACHE)
-        self.vocab = build_hair_vocab(self.tagger.general_names)
+        # 語彙は同期済みの data/hair_vocab.json を優先（語彙拡張を exe 更新なしで配れる）。
+        # モデルが知らないタグは無視。ファイルが無ければ従来どおりコードの許可リストから構築。
+        vocab_f = data_file("hair_vocab.json")
+        if vocab_f.exists():
+            known = set(self.tagger.general_names)
+            self.vocab = [t for t in json.loads(vocab_f.read_text(encoding="utf-8")) if t in known]
+        else:
+            self.vocab = build_hair_vocab(self.tagger.general_names)
         self.vocab_index = {t: i for i, t in enumerate(self.vocab)}
+
+        # 外部辞書（同期対象）を組み込み同義語にマージ。辞書追加も exe 更新なしで届く
+        n_ext = load_external_dict(data_file("jp_synonyms.json"))
+        if n_ext:
+            print(f"  外部辞書: {n_ext} エントリ取込")
 
         # ファイルは construction 時に解決（起動時 sync 後の最新を拾う）
         products = json.loads(data_file("products.json").read_text(encoding="utf-8"))

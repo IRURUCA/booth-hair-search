@@ -28,6 +28,7 @@ datas += [
     (os.path.join(ROOT, "data", "hair_vectors.json"), "data"),
     (os.path.join(ROOT, "data", "hair_vocab.json"), "data"),
     (os.path.join(ROOT, "data", "product_stats.json"), "data"),
+    (os.path.join(ROOT, "data", "jp_synonyms.json"), "data"),
     (os.path.join(ROOT, "model", "model.onnx"), "model"),
     (os.path.join(ROOT, "model", "selected_tags.csv"), "model"),
 ]
