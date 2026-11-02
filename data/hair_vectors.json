@@ -17013,16 +17013,6 @@
     "sidelocks": 0.0565,
     "very_long_hair": 0.4961
   },
-  "5067901": {
-    "hair_between_eyes": 0.2382,
-    "hair_over_eyes": 0.2376,
-    "hair_over_one_eye": 0.3975,
-    "long_bangs": 0.0708,
-    "long_hair": 0.4101,
-    "medium_hair": 0.1214,
-    "short_hair": 0.5942,
-    "short_hair_with_long_locks": 0.0703
-  },
   "5063714": {
     "hair_between_eyes": 0.1055,
     "hair_intakes": 0.1317,
@@ -17726,21 +17716,6 @@
     "twintails": 0.852,
     "very_long_hair": 0.8478
   },
-  "4496177": {
-    "hair_between_eyes": 0.3541,
-    "hair_over_eyes": 0.2789,
-    "hair_over_one_eye": 0.8194,
-    "long_bangs": 0.0855,
-    "long_hair": 0.8195,
-    "low_ponytail": 0.2433,
-    "medium_hair": 0.0572,
-    "parted_bangs": 0.0591,
-    "ponytail": 0.1021,
-    "short_hair": 0.5766,
-    "sidelocks": 0.0545,
-    "swept_bangs": 0.0707,
-    "very_long_hair": 0.053
-  },
   "4484149": {
     "bob_cut": 0.2079,
     "hair_between_eyes": 0.1449,
@@ -17958,12 +17933,6 @@
     "medium_hair": 0.0515,
     "short_hair": 0.6822
   },
-  "4252285": {
-    "hair_between_eyes": 0.0518,
-    "hair_over_one_eye": 0.7759,
-    "long_bangs": 0.0513,
-    "short_hair": 0.3903
-  },
   "4242246": {
     "ahoge": 0.9151,
     "drill_hair": 0.9315,
@@ -17998,15 +17967,6 @@
     "sidelocks": 0.1371,
     "very_long_hair": 0.2931,
     "wavy_hair": 0.1492
-  },
-  "4215299": {
-    "bob_cut": 0.1009,
-    "hair_between_eyes": 0.2369,
-    "hair_over_eyes": 0.0889,
-    "hair_over_one_eye": 0.289,
-    "long_hair": 0.4349,
-    "ponytail": 0.4628,
-    "short_hair": 0.7513
   },
   "4186872": {
     "crossed_bangs": 0.0613,
@@ -22634,5 +22594,310 @@
   "9008864": {
     "hair_over_one_eye": 0.4333,
     "short_hair": 0.5625
+  },
+  "9086975": {
+    "twintails": 0.0734
+  },
+  "9071538": {
+    "hair_between_eyes": 0.1573,
+    "hair_over_one_eye": 0.1122,
+    "long_hair": 0.8483,
+    "ponytail": 0.4323,
+    "sidelocks": 0.1076,
+    "twintails": 0.1295,
+    "very_long_hair": 0.4825
+  },
+  "9080779": {
+    "blunt_bangs": 0.3048,
+    "bob_cut": 0.1975,
+    "hair_between_eyes": 0.0827,
+    "hair_intakes": 0.1706,
+    "medium_hair": 0.1889,
+    "short_hair": 0.6074
+  },
+  "9085393": {
+    "crossed_bangs": 0.3294,
+    "hair_between_eyes": 0.6059,
+    "medium_hair": 0.1836,
+    "messy_hair": 0.1919,
+    "short_hair": 0.5899
+  },
+  "9081793": {
+    "long_hair": 0.8736,
+    "parted_bangs": 0.1898,
+    "parted_hair": 0.0554,
+    "wavy_hair": 0.0784
+  },
+  "9080592": {
+    "ahoge": 0.7847,
+    "cowlick": 0.0639,
+    "hair_between_eyes": 0.112,
+    "hair_over_one_eye": 0.8428,
+    "long_bangs": 0.2163,
+    "medium_hair": 0.0566,
+    "short_hair": 0.8248
+  },
+  "9079116": {
+    "ahoge": 0.9343,
+    "crossed_bangs": 0.0527,
+    "hair_between_eyes": 0.4333,
+    "hair_intakes": 0.2252,
+    "long_hair": 0.9155,
+    "sidelocks": 0.2318,
+    "twintails": 0.1345,
+    "two_side_up": 0.4998,
+    "very_long_hair": 0.0665
+  },
+  "9079517": {
+    "ahoge": 0.6647,
+    "blunt_bangs": 0.1395,
+    "hair_between_eyes": 0.06,
+    "hair_bun": 0.0663,
+    "hair_intakes": 0.106,
+    "long_hair": 0.7328,
+    "sidelocks": 0.0786,
+    "twintails": 0.9413,
+    "very_long_hair": 0.0922
+  },
+  "9079549": {
+    "braid": 0.059,
+    "long_hair": 0.6975,
+    "spiked_hair": 0.5811,
+    "very_long_hair": 0.0772
+  },
+  "9078668": {
+    "ahoge": 0.5998,
+    "antenna_hair": 0.1071,
+    "hair_between_eyes": 0.1126,
+    "hair_intakes": 0.0661,
+    "hair_over_one_eye": 0.3252,
+    "long_hair": 0.1713,
+    "medium_hair": 0.1483,
+    "short_hair": 0.3369,
+    "sidelocks": 0.1322
+  },
+  "9076384": {
+    "ahoge": 0.9108,
+    "blunt_bangs": 0.28,
+    "hair_over_one_eye": 0.8114,
+    "long_hair": 0.873,
+    "sidelocks": 0.072,
+    "very_long_hair": 0.3601
+  },
+  "9059752": {
+    "blunt_bangs": 0.4388,
+    "hair_between_eyes": 0.1369,
+    "hair_intakes": 0.3575,
+    "long_bangs": 0.0564,
+    "long_hair": 0.6674,
+    "low_twintails": 0.1108,
+    "medium_hair": 0.089,
+    "short_hair_with_long_locks": 0.1291,
+    "sidelocks": 0.2017,
+    "twintails": 0.2561
+  },
+  "9064355": {
+    "hair_between_eyes": 0.4504,
+    "long_hair": 0.8901,
+    "very_long_hair": 0.4711
+  },
+  "9070838": {
+    "ahoge": 0.4116,
+    "hair_between_eyes": 0.1467,
+    "hair_over_one_eye": 0.6207,
+    "long_bangs": 0.1215,
+    "medium_hair": 0.0824,
+    "short_hair": 0.636
+  },
+  "8970297": {
+    "blunt_bangs": 0.3472,
+    "hair_intakes": 0.0881,
+    "long_hair": 0.5816,
+    "medium_hair": 0.0787,
+    "sidelocks": 0.2186
+  },
+  "9069526": {
+    "blunt_bangs": 0.1207,
+    "hair_between_eyes": 0.0786,
+    "hair_intakes": 0.4705,
+    "high_ponytail": 0.2452,
+    "long_hair": 0.9117,
+    "ponytail": 0.751,
+    "sidelocks": 0.2837,
+    "very_long_hair": 0.2472
+  },
+  "8986012": {
+    "ahoge": 0.6507,
+    "hair_between_eyes": 0.3124,
+    "long_hair": 0.8315,
+    "sidelocks": 0.0856,
+    "very_long_hair": 0.4747
+  },
+  "9068277": {
+    "hair_between_eyes": 0.6553,
+    "long_bangs": 0.0627,
+    "messy_hair": 0.0725,
+    "short_hair": 0.6483
+  },
+  "9067538": {
+    "parted_bangs": 0.0805,
+    "short_hair": 0.7145
+  },
+  "8998317": {
+    "hair_between_eyes": 0.5585,
+    "hair_over_eyes": 0.2461,
+    "short_hair": 0.7318
+  },
+  "9050699": {
+    "braid": 0.182,
+    "double_bun": 0.8537,
+    "hair_between_eyes": 0.427,
+    "hair_bun": 0.8128,
+    "hair_intakes": 0.1802,
+    "long_hair": 0.4535,
+    "sidelocks": 0.066,
+    "two_side_up": 0.1252
+  },
+  "9064573": {
+    "blunt_bangs": 0.5245,
+    "braid": 0.5167,
+    "braided_bun": 0.1704,
+    "crown_braid": 0.0688,
+    "double_bun": 0.6908,
+    "hair_bun": 0.7067,
+    "short_hair": 0.4009
+  },
+  "9063978": {
+    "blunt_bangs": 0.4284,
+    "hair_between_eyes": 0.1102,
+    "hair_intakes": 0.1973,
+    "long_hair": 0.8186,
+    "low_twintails": 0.2821,
+    "short_hair_with_long_locks": 0.0529,
+    "sidelocks": 0.1905,
+    "twintails": 0.1577,
+    "very_long_hair": 0.2611
+  },
+  "9063984": {
+    "ahoge": 0.8644,
+    "hair_between_eyes": 0.5537,
+    "hair_intakes": 0.2739,
+    "long_hair": 0.8653,
+    "sidelocks": 0.1771,
+    "twintails": 0.8601,
+    "two_side_up": 0.0763,
+    "very_long_hair": 0.4788
+  },
+  "9064360": {},
+  "9063940": {
+    "mohawk": 0.052,
+    "pompadour": 0.1948,
+    "short_hair": 0.696,
+    "spiked_hair": 0.3059,
+    "undercut": 0.102,
+    "very_short_hair": 0.214
+  },
+  "9062026": {
+    "blunt_bangs": 0.3348,
+    "hair_between_eyes": 0.1564,
+    "long_hair": 0.647,
+    "twintails": 0.2239,
+    "two_side_up": 0.4476,
+    "wavy_hair": 0.057
+  },
+  "9001684": {
+    "ahoge": 0.1105,
+    "hair_between_eyes": 0.4048,
+    "medium_hair": 0.0754,
+    "messy_hair": 0.1419,
+    "short_hair": 0.719
+  },
+  "9025451": {
+    "blunt_bangs": 0.4397,
+    "hair_intakes": 0.6019,
+    "long_hair": 0.2782,
+    "medium_hair": 0.3857,
+    "short_hair": 0.0551,
+    "sidelocks": 0.1039,
+    "twintails": 0.856,
+    "two_side_up": 0.0582
+  },
+  "9036746": {
+    "hair_between_eyes": 0.4823,
+    "hair_bun": 0.6205,
+    "long_bangs": 0.1916,
+    "long_hair": 0.0717,
+    "medium_hair": 0.0659,
+    "short_hair": 0.2538,
+    "sidelocks": 0.1081,
+    "single_hair_bun": 0.365,
+    "single_side_bun": 0.0566
+  },
+  "9051899": {
+    "blunt_bangs": 0.1386,
+    "curtained_hair": 0.0945,
+    "hair_intakes": 0.4241,
+    "long_hair": 0.6599,
+    "medium_hair": 0.1635,
+    "one_side_up": 0.1563,
+    "parted_bangs": 0.1352,
+    "sidelocks": 0.3741,
+    "twintails": 0.3188,
+    "two_side_up": 0.3598,
+    "wavy_hair": 0.1393
+  },
+  "9053400": {
+    "blunt_bangs": 0.0767,
+    "hair_between_eyes": 0.2299,
+    "hair_intakes": 0.0837,
+    "long_hair": 0.9004,
+    "sidelocks": 0.3,
+    "very_long_hair": 0.1178
+  },
+  "9046883": {
+    "blunt_bangs": 0.2317,
+    "hair_between_eyes": 0.522,
+    "long_hair": 0.8471,
+    "sidelocks": 0.092,
+    "twintails": 0.2371,
+    "very_long_hair": 0.0654,
+    "wavy_hair": 0.3916
+  },
+  "9046315": {
+    "blunt_bangs": 0.1658,
+    "long_hair": 0.8117,
+    "low_ponytail": 0.074,
+    "ponytail": 0.1292,
+    "side_ponytail": 0.3211,
+    "very_long_hair": 0.0716
+  },
+  "9053741": {
+    "braid": 0.0555,
+    "crossed_bangs": 0.3976,
+    "hair_between_eyes": 0.6625,
+    "hair_intakes": 0.4898,
+    "long_hair": 0.6813,
+    "sidelocks": 0.0909
+  },
+  "9053322": {
+    "curtained_hair": 0.1283,
+    "hair_between_eyes": 0.2913,
+    "parted_bangs": 0.4224,
+    "parted_hair": 0.0577,
+    "short_hair": 0.8603
+  },
+  "9050246": {
+    "curly_hair": 0.1637,
+    "hair_bun": 0.3337,
+    "medium_hair": 0.0612,
+    "short_hair": 0.7287,
+    "single_hair_bun": 0.1047,
+    "wavy_hair": 0.1776
+  },
+  "9021547": {
+    "hair_between_eyes": 0.1177,
+    "medium_hair": 0.2386,
+    "short_hair": 0.436,
+    "sidelocks": 0.1544
   }
 }

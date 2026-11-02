@@ -19600,16 +19600,6 @@
     "has_vrchat_badge": true
   },
   {
-    "product_id": "5067901",
-    "name": "【VRChat向け】アンダルアバターヘアー 3",
-    "url": "https://booth.pm/ja/items/5067901",
-    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/991dc833-2773-4465-8804-43025c56c16b/i/5067901/250697f2-ed0f-42f2-a24c-de3f5401f526_base_resized.jpg",
-    "shop_name": "Andall♦セール開催中",
-    "shop_url": "https://t8dbcau.booth.pm/",
-    "price": 1000,
-    "has_vrchat_badge": true
-  },
-  {
     "product_id": "5063714",
     "name": "[VRC Hair] Nya! 猫耳 ショートカット",
     "url": "https://booth.pm/ja/items/5063714",
@@ -20460,16 +20450,6 @@
     "has_vrchat_badge": true
   },
   {
-    "product_id": "4496177",
-    "name": "【VRChat向け】アンダルアバターヘアー 2",
-    "url": "https://booth.pm/ja/items/4496177",
-    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/991dc833-2773-4465-8804-43025c56c16b/i/4496177/a70744dc-37b2-4ffa-8a33-4cf1056d90b2_base_resized.jpg",
-    "shop_name": "Andall♦セール開催中",
-    "shop_url": "https://t8dbcau.booth.pm/",
-    "price": 1000,
-    "has_vrchat_badge": true
-  },
-  {
     "product_id": "4484149",
     "name": "可愛くてクールなサイドテールショートヘア",
     "url": "https://booth.pm/ja/items/4484149",
@@ -20710,16 +20690,6 @@
     "has_vrchat_badge": true
   },
   {
-    "product_id": "4252285",
-    "name": "【VRChat向け】AND-S1-Hair　Ver.1.10",
-    "url": "https://booth.pm/ja/items/4252285",
-    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/991dc833-2773-4465-8804-43025c56c16b/i/4252285/84b2a3be-1391-4d38-bcee-6b80c8448e6f_base_resized.jpg",
-    "shop_name": "Andall♦セール開催中",
-    "shop_url": "https://t8dbcau.booth.pm/",
-    "price": 1000,
-    "has_vrchat_badge": true
-  },
-  {
     "product_id": "4242246",
     "name": "[VRC Hair]Happiness!",
     "url": "https://booth.pm/ja/items/4242246",
@@ -20756,16 +20726,6 @@
     "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/343455c8-13fa-4871-aa62-61ca786c23f1/i/4219099/c075e02e-2010-41b3-914b-fd146eb41a63_base_resized.jpg",
     "shop_name": "ANKA",
     "shop_url": "https://angka.booth.pm/",
-    "price": 1000,
-    "has_vrchat_badge": true
-  },
-  {
-    "product_id": "4215299",
-    "name": "【VRChat向け】アンダルアバターヘアー1",
-    "url": "https://booth.pm/ja/items/4215299",
-    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/991dc833-2773-4465-8804-43025c56c16b/i/4215299/afc71017-5caa-41f1-83f7-0e2aa75990fb_base_resized.jpg",
-    "shop_name": "Andall♦セール開催中",
-    "shop_url": "https://t8dbcau.booth.pm/",
     "price": 1000,
     "has_vrchat_badge": true
   },
@@ -26297,6 +26257,386 @@
     "shop_name": "Neochan_shop",
     "shop_url": "https://neochan.booth.pm/",
     "price": 1000,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9086975",
+    "name": "3Dレトロ・リボン・ヘアバンド　[.obj]  [.csmo]  [.clip]",
+    "url": "https://booth.pm/ja/items/9086975",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/166a10b4-4dfd-45c6-b03d-fc6ccd7aab6f/i/9086975/50276391-b866-4555-8fd5-5b225e9b1fc5_base_resized.jpg",
+    "shop_name": "Fossette",
+    "shop_url": "https://tsubasa-shino.booth.pm/",
+    "price": 3975,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "9071538",
+    "name": "【VRChat Hair model】Soramusubi【10アバター対応】",
+    "url": "https://booth.pm/ja/items/9071538",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/99e0b942-54bc-417b-8601-66c79d21b255/i/9071538/3cfb969d-9af4-49e9-93ca-86e016d7b852_base_resized.jpg",
+    "shop_name": "Uneri",
+    "shop_url": "https://s-uneri.booth.pm/",
+    "price": 500,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9080779",
+    "name": "【14アバター対応】NaturalGazeHair030",
+    "url": "https://booth.pm/ja/items/9080779",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/49a6efae-88ef-4d0f-8c85-c95c1efbbb5f/i/9080779/19692dc8-e80c-4e8c-9610-01c0f22e4ba7_base_resized.jpg",
+    "shop_name": "Natural Gaze",
+    "shop_url": "https://naturalshop.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9085393",
+    "name": "3Dヘアモデル「ウルフカットヘア」",
+    "url": "https://booth.pm/ja/items/9085393",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/2f76814d-708d-402f-9f2c-2cd9dc539363/i/9085393/d50ae40a-843b-4fb1-a0f9-4d6ca4f4a94e_base_resized.jpg",
+    "shop_name": "teacan",
+    "shop_url": "https://teacan.booth.pm/",
+    "price": 100,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9081793",
+    "name": "♡ 300円OFF ♡ 【9アバター対応】 Soft Wavy Hair",
+    "url": "https://booth.pm/ja/items/9081793",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/b4d473fb-1145-4cd6-91ad-b3c006599343/i/9081793/dfbd8231-3148-407f-ae63-2441f5c99e25_base_resized.jpg",
+    "shop_name": "Melt Room",
+    "shop_url": "https://inmeltroom.booth.pm/",
+    "price": 500,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9080592",
+    "name": "エルエル対応「ウルフヘアー＆目隠れヘアー」",
+    "url": "https://booth.pm/ja/items/9080592",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/33251080-668a-4b04-8801-341543d88eca/i/9080592/3db17974-23af-497e-9ec2-79a1f0e5b239_base_resized.jpg",
+    "shop_name": "兎水乃工房-UMINO KOUBOU-",
+    "shop_url": "https://nyaro.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "9079116",
+    "name": "【VRChat】Soft Twin Tail Hair | ソフトツインテールヘア【ヘアアセット】",
+    "url": "https://booth.pm/ja/items/9079116",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/01b62248-7bfd-4aab-98ee-215451b3e409/i/9079116/d903649c-34f2-473b-8867-d25ef7cd0849_base_resized.jpg",
+    "shop_name": "nekostudios",
+    "shop_url": "https://nekostudios.booth.pm/",
+    "price": 850,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9079517",
+    "name": "ポチッとするだけ！ヘアカラナビ86色＋カスタムカラーツール【ミルフィ専用】",
+    "url": "https://booth.pm/ja/items/9079517",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/66406bb1-7932-493b-91f3-68a9f6c138fc/i/9079517/543bcfb2-31ff-4bd6-b349-3790c754e957_base_resized.jpg",
+    "shop_name": "Atelier_Cloveria",
+    "shop_url": "https://atelier-cloveria.booth.pm/",
+    "price": 300,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9079549",
+    "name": "Vroid用　白蓮の髪（期間限定髪配布11/1から11/5まで無料配布）",
+    "url": "https://booth.pm/ja/items/9079549",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/f8e82cb0-b1cd-4fc4-be65-d4f2a8d94e85/i/9079549/76dcd117-8faa-4a52-84e5-d0ec637b34b3_base_resized.jpg",
+    "shop_name": "official-satori",
+    "shop_url": "https://official-satori.booth.pm/",
+    "price": 0,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "9078668",
+    "name": "ポチッとするだけ！ヘアカラナビ86色＋カスタムカラーツール【ソルト専用】",
+    "url": "https://booth.pm/ja/items/9078668",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/66406bb1-7932-493b-91f3-68a9f6c138fc/i/9078668/45f2a91f-3d1c-4c27-af89-a37529275b4c_base_resized.jpg",
+    "shop_name": "Atelier_Cloveria",
+    "shop_url": "https://atelier-cloveria.booth.pm/",
+    "price": 300,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9076384",
+    "name": "【100円引きセール中！】きゅるるんメカクレロングヘア【8アバター対応】",
+    "url": "https://booth.pm/ja/items/9076384",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/febd6f1a-1418-4b39-bf09-0484880fb117/i/9076384/1f24b648-9c8f-4c37-8a6b-ae787ffd3727_base_resized.jpg",
+    "shop_name": "OnlyRory",
+    "shop_url": "https://onlyrory.booth.pm/",
+    "price": 600,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9059752",
+    "name": "「VRC Hair」 Melti Wavy Hair ⋰˚⭐︎",
+    "url": "https://booth.pm/ja/items/9059752",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/93a5c145-0199-4d91-9dd7-cd7d80e2cf7c/i/9059752/4e48e26d-0aa1-4ccc-b50a-280f0a79bdc0_base_resized.jpg",
+    "shop_name": "blurring ✩°｡⋆",
+    "shop_url": "https://blurring.booth.pm/",
+    "price": 650,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9064355",
+    "name": "どんぐりと伝令【31アバター対応 / 3D髪型】",
+    "url": "https://booth.pm/ja/items/9064355",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/521a74f4-d91c-4d3d-8805-45d60b2b6171/i/9064355/67c6b7d7-2f3b-44de-a397-442214d360f2_base_resized.jpg",
+    "shop_name": "P*Connect",
+    "shop_url": "https://psha.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9070838",
+    "name": "もなと専用髪型3種",
+    "url": "https://booth.pm/ja/items/9070838",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/33251080-668a-4b04-8801-341543d88eca/i/9070838/38eb64bf-abec-4043-914e-d1c892abda40_base_resized.jpg",
+    "shop_name": "兎水乃工房-UMINO KOUBOU-",
+    "shop_url": "https://nyaro.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "8970297",
+    "name": "【6アバター対応】カチュコレ_C.C.C【VRC想定】",
+    "url": "https://booth.pm/ja/items/8970297",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/af341856-211e-40f4-969a-d095620ef1cb/i/8970297/abaf77a8-c7d1-49a8-b995-5043a6dc9317_base_resized.jpg",
+    "shop_name": "samoshop",
+    "shop_url": "https://samoari.booth.pm/",
+    "price": 800,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9069526",
+    "name": "✨❕セール中❕✨【22アバター対応】 𝐋𝐕.𝟏𝟐+ Puffy_Hair ❄️",
+    "url": "https://booth.pm/ja/items/9069526",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/26e7f95c-43be-4b8a-af00-9435662650e4/i/9069526/d9e507e4-59f5-4499-a03e-8c23f936e435_base_resized.jpg",
+    "shop_name": "LookVook",
+    "shop_url": "https://lookvook.booth.pm/",
+    "price": 690,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "8986012",
+    "name": "【🎊発売記念SALE中🎊】WildLayerLongHair【Gimmick付・10Avatar対応】",
+    "url": "https://booth.pm/ja/items/8986012",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/3cafeb43-5a51-4b8b-b815-0102fd42dd0f/i/8986012/0020fda9-aca6-4456-ad8a-d29af3ec6793_base_resized.jpg",
+    "shop_name": "POTATO CLOSET",
+    "shop_url": "https://potatocloset.booth.pm/",
+    "price": 900,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "9068277",
+    "name": "【vroidヘアープリセット】怪しげなキノコ　つけ髪",
+    "url": "https://booth.pm/ja/items/9068277",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/2e5a1626-efdd-4af3-b744-2cbc6d4cccda/i/9068277/eb7ec0d5-7464-4527-be08-67f96fba80fa_base_resized.jpg",
+    "shop_name": "マッディカンパニー",
+    "shop_url": "https://maddydead.booth.pm/",
+    "price": 0,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "9067538",
+    "name": "ポチッとするだけ！ヘアカラナビ86色＋カスタムカラーツール【凛秋専用】",
+    "url": "https://booth.pm/ja/items/9067538",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/66406bb1-7932-493b-91f3-68a9f6c138fc/i/9067538/7b65bd0d-184e-43bf-b414-897746194bf6_base_resized.jpg",
+    "shop_name": "Atelier_Cloveria",
+    "shop_url": "https://atelier-cloveria.booth.pm/",
+    "price": 300,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "8998317",
+    "name": "HAIR_004",
+    "url": "https://booth.pm/ja/items/8998317",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/dbe84269-2d78-41ec-aac8-08596089d7fa/i/8998317/e447037b-4580-44c9-809e-3867d8928407_base_resized.jpg",
+    "shop_name": "Tamago House",
+    "shop_url": "https://tamagohouse.booth.pm/",
+    "price": 690,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9050699",
+    "name": "【17アバター対応】マオマオヘア",
+    "url": "https://booth.pm/ja/items/9050699",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/cd116ea3-a956-46bb-b903-9256986c5b94/i/9050699/6612d876-5fa1-4b97-8f91-b6d0ce3d74a2_base_resized.jpg",
+    "shop_name": "ssugana",
+    "shop_url": "https://ssugana.booth.pm/",
+    "price": 500,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9064573",
+    "name": "BonBonHari",
+    "url": "https://booth.pm/ja/items/9064573",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/732907dd-77e7-4d38-bc86-1579d88b4603/i/9064573/9433e38e-d73a-47a2-8a1c-5b4430fffc5c_base_resized.jpg",
+    "shop_name": "💗𝐔𝐳𝐔𝗌𝗁𝗈𝗉💗",
+    "shop_url": "https://vivi12.booth.pm/",
+    "price": 380,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9063978",
+    "name": "【20アバター対応】ぱたぱたウルフ【VRChat】",
+    "url": "https://booth.pm/ja/items/9063978",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/aa0be63e-cec2-400e-953a-db726d92735f/i/9063978/f3816a68-b20a-4e7b-b3c4-a66c69ffeffd_base_resized.jpg",
+    "shop_name": "Pirouette",
+    "shop_url": "https://pipi18.booth.pm/",
+    "price": 600,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9063984",
+    "name": "✧SALE✧【9アバター対応】ハーフクリップドヘア - Half Clipped hair -",
+    "url": "https://booth.pm/ja/items/9063984",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/cd351df1-167a-4572-9c99-cecf0b39143d/i/9063984/7abef4f2-1b13-4d02-97a4-0bafad9f3bbc_base_resized.jpg",
+    "shop_name": "白昼夢",
+    "shop_url": "https://atc.booth.pm/",
+    "price": 600,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9064360",
+    "name": "【キプフェル専用 / Kipfel】かぎっこチョーカー Padlock Choker【3Dアクセサリー】",
+    "url": "https://booth.pm/ja/items/9064360",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/acb3c673-f922-43f0-b3aa-02ba7446923c/i/9064360/3a2c25cf-d63c-4c1f-8a82-cd1d17ed4b03_base_resized.jpg",
+    "shop_name": "KOMEMUGI",
+    "shop_url": "https://komemugi.booth.pm/",
+    "price": 300,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9063940",
+    "name": "✨Sale🍾【5 avatars】Ism Hair【VRC Hair】",
+    "url": "https://booth.pm/ja/items/9063940",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/353e6ea3-8d6c-42e1-9ab2-476454d2993f/i/9063940/a4eadd9f-419a-4774-afa8-5c72b9104c2a_base_resized.jpg",
+    "shop_name": "C's",
+    "shop_url": "https://caster0128.booth.pm/",
+    "price": 500,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9062026",
+    "name": "ポチッとするだけ！ヘアカラナビ86色＋カスタムカラーツール【ちゆ専用】",
+    "url": "https://booth.pm/ja/items/9062026",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/66406bb1-7932-493b-91f3-68a9f6c138fc/i/9062026/55390ea2-fa29-4145-bf0f-6c2886b10ddd_base_resized.jpg",
+    "shop_name": "Atelier_Cloveria",
+    "shop_url": "https://atelier-cloveria.booth.pm/",
+    "price": 300,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9001684",
+    "name": "【23アバター対応】天然パーマ2/naturally curly Hair【MA対応】",
+    "url": "https://booth.pm/ja/items/9001684",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/50b11eed-d0e7-4c4c-bead-f3f573ec0a4d/i/9001684/05ad8a3d-df14-448b-9382-7983a9274183_base_resized.jpg",
+    "shop_name": "いきどまり-dead end-",
+    "shop_url": "https://amama40.booth.pm/",
+    "price": 800,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9025451",
+    "name": "💕ネレイジー (Nellazy) ㅡ 【 VRChat Hair / 3Dヘア 】",
+    "url": "https://booth.pm/ja/items/9025451",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/e88ffa24-c9f7-4f31-84e5-f5003fddee00/i/9025451/6217fd0f-03aa-44b6-9238-f49c3845dfe4_base_resized.jpg",
+    "shop_name": "SweetCloud_3D",
+    "shop_url": "https://captaincoc.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9036746",
+    "name": "♡ 30% SALE ♡【14アバター対応】 Muse Low Bun🤍",
+    "url": "https://booth.pm/ja/items/9036746",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/428157be-1b8a-4d0e-a3e0-b9f7e8f7c245/i/9036746/fada71c1-9c26-451b-8afc-cc6ac9e529c4_base_resized.jpg",
+    "shop_name": "SOUR FLAVOR",
+    "shop_url": "https://sourflavor.booth.pm/",
+    "price": 630,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9051899",
+    "name": "メッシュカラーハーフツイン【Lapwing対応】",
+    "url": "https://booth.pm/ja/items/9051899",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/68f5df7f-904f-45b2-a380-945f269259c9/i/9051899/bdc34753-3168-4b21-b7bd-9e6cdcee65bc_base_resized.jpg",
+    "shop_name": "tao屋",
+    "shop_url": "https://taoya.booth.pm/",
+    "price": 700,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9053400",
+    "name": "【22 avatars】【VRC Hair】SP-008",
+    "url": "https://booth.pm/ja/items/9053400",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/f0b1ad24-9ba4-4f1e-9500-2ec753385998/i/9053400/3d022bbf-f883-46ad-82c5-8171315c2af2_base_resized.jpg",
+    "shop_name": "siropapa",
+    "shop_url": "https://siropapa.booth.pm/",
+    "price": 1100,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9046883",
+    "name": "🍪【 𝐘𝐔𝐘𝐔 】 𝐇𝐨𝐛𝐛𝐲 𝐇𝐚𝐢𝐫 𝟎𝟑",
+    "url": "https://booth.pm/ja/items/9046883",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/23403040-a7bc-4e2b-83ee-e2869ca8cfea/i/9046883/8d6ee836-d5d5-4b1e-a352-2050746fcbb4_base_resized.jpg",
+    "shop_name": "YUYU.",
+    "shop_url": "https://yuyustore.booth.pm/",
+    "price": 900,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9046315",
+    "name": "ZOC_NO.8 ベロアヘア Velour Hair",
+    "url": "https://booth.pm/ja/items/9046315",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/07ad120f-f3b9-4d6b-bc94-659df97a6c34/i/9046315/e104785b-f192-4b97-b67e-9daf4c932b77_base_resized.jpg",
+    "shop_name": "ZOC",
+    "shop_url": "https://zoc.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9053741",
+    "name": "HaloWolf",
+    "url": "https://booth.pm/ja/items/9053741",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/c5c7dd82-095d-4da8-a304-372ae5684db2/i/9053741/8e296ab4-843b-4075-b9e2-0888163c88af_base_resized.jpg",
+    "shop_name": "smnk",
+    "shop_url": "https://smnk.booth.pm/",
+    "price": 700,
+    "has_vrchat_badge": false
+  },
+  {
+    "product_id": "9053322",
+    "name": "SALE中【VRC Hair】Selvar_Hair",
+    "url": "https://booth.pm/ja/items/9053322",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/bee39324-9834-4b08-a88b-1eed5d82e78f/i/9053322/12655162-2859-48ee-a9f9-7578f673736b_base_resized.jpg",
+    "shop_name": "Kyee_N",
+    "shop_url": "https://kyeen.booth.pm/",
+    "price": 750,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9050246",
+    "name": "【ヘア】LAZY LOOP CUT｜17アバター対応",
+    "url": "https://booth.pm/ja/items/9050246",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/4dc13462-89ee-4507-8c21-94f16f1e400c/i/9050246/00e0fcb6-1c6e-41ea-b16d-0c51a60add3a_base_resized.jpg",
+    "shop_name": "ShinyQ",
+    "shop_url": "https://shinyq.booth.pm/",
+    "price": 1000,
+    "has_vrchat_badge": true
+  },
+  {
+    "product_id": "9021547",
+    "name": "髪型01_癖っ毛ヘアー(9アバター対応)",
+    "url": "https://booth.pm/ja/items/9021547",
+    "thumbnail_url": "https://booth.pximg.net/c/300x300_a2_g5/fd080b93-50c9-4a89-a7f8-30ac4bbe9f44/i/9021547/081bd5b3-1f28-4189-9a67-7db06cbdaae4_base_resized.jpg",
+    "shop_name": "P_Store",
+    "shop_url": "https://poppo-shop.booth.pm/",
+    "price": 800,
     "has_vrchat_badge": true
   }
 ]
